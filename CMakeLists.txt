@@ -13,7 +13,9 @@ include(Dependencies)
 add_library(binify_core STATIC
   src/core/config.cpp
   src/core/creation_policy.cpp
-  src/core/error.cpp)
+  src/core/error.cpp
+  src/core/path_utils.cpp
+  src/core/text_encoding.cpp)
 add_library(binify::core ALIAS binify_core)
 target_include_directories(binify_core PUBLIC src)
 binify_apply_project_options(binify_core)
@@ -42,7 +44,13 @@ binify_apply_project_options(binify)
 enable_testing()
 
 add_executable(binify_unit_tests
-  tests/unit/smoke_tests.cpp)
+  tests/unit/config_model_tests.cpp
+  tests/unit/creation_policy_tests.cpp
+  tests/unit/error_tests.cpp
+  tests/unit/path_utils_tests.cpp
+  tests/unit/result_tests.cpp
+  tests/unit/smoke_tests.cpp
+  tests/unit/text_encoding_tests.cpp)
 target_link_libraries(binify_unit_tests PRIVATE binify::core GTest::gtest_main)
 binify_apply_project_options(binify_unit_tests)
 include(GoogleTest)
@@ -53,4 +61,3 @@ add_executable(binify_integration_tests
 target_link_libraries(binify_integration_tests PRIVATE binify::windows GTest::gtest_main)
 binify_apply_project_options(binify_integration_tests)
 gtest_discover_tests(binify_integration_tests)
-

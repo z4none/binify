@@ -1,5 +1,8 @@
 #pragma once
 
+#include <span>
+#include <string_view>
+
 namespace binify::core {
 
 enum class LinkMode {
@@ -9,5 +12,9 @@ enum class LinkMode {
   cmd_wrapper = 3
 };
 
-} // namespace binify::core
+[[nodiscard]] std::wstring_view display_name(LinkMode mode) noexcept;
+[[nodiscard]] std::wstring_view entry_extension(LinkMode mode) noexcept;
+[[nodiscard]] bool is_specific_mode(LinkMode mode) noexcept;
+[[nodiscard]] std::span<const LinkMode> auto_mode_sequence() noexcept;
 
+} // namespace binify::core

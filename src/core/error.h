@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <string>
+#include <string_view>
 
 namespace binify::core {
 
@@ -10,6 +11,10 @@ enum class ErrorCode {
   not_implemented,
   invalid_argument,
   config_invalid,
+  config_missing,
+  path_invalid,
+  path_not_absolute,
+  encoding_error,
   platform_error
 };
 
@@ -21,6 +26,12 @@ struct Error {
 };
 
 [[nodiscard]] Error make_error(ErrorCode code, std::wstring message);
+[[nodiscard]] Error make_error(
+  ErrorCode code,
+  std::wstring message,
+  std::optional<unsigned long> native_code,
+  std::optional<std::wstring> path);
+[[nodiscard]] std::wstring_view to_wstring(ErrorCode code) noexcept;
+[[nodiscard]] bool is_recoverable_config_error(ErrorCode code) noexcept;
 
 } // namespace binify::core
-
