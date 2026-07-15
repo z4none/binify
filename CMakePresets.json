@@ -9,7 +9,7 @@
     {
       "name": "windows-base",
       "hidden": true,
-      "generator": "Visual Studio 17 2022",
+      "generator": "Visual Studio 18 2026",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
         "CMAKE_CXX_STANDARD": "20",
@@ -21,34 +21,22 @@
     {
       "name": "windows-x64-debug",
       "inherits": "windows-base",
-      "architecture": "x64",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
+      "architecture": "x64"
     },
     {
       "name": "windows-x64-release",
       "inherits": "windows-base",
-      "architecture": "x64",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
+      "architecture": "x64"
     },
     {
       "name": "windows-x86-release",
       "inherits": "windows-base",
-      "architecture": "Win32",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
+      "architecture": "Win32"
     },
     {
       "name": "windows-arm64-release",
       "inherits": "windows-base",
-      "architecture": "ARM64",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
+      "architecture": "ARM64"
     }
   ],
   "buildPresets": [
@@ -84,4 +72,3 @@
     }
   ]
 }
-

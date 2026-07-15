@@ -1,6 +1,7 @@
 include(FetchContent)
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/winlamb/winlamb.hpp")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/winlamb/winlamb.hpp"
+    OR EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/winlamb/wnd.h")
   add_library(winlamb INTERFACE)
   target_include_directories(winlamb SYSTEM INTERFACE
     "${CMAKE_CURRENT_SOURCE_DIR}/third_party/winlamb")
@@ -20,7 +21,6 @@ FetchContent_MakeAvailable(nlohmann_json)
 
 FetchContent_Declare(googletest
   URL https://github.com/google/googletest/archive/refs/tags/v1.16.0.zip
-  URL_HASH SHA256=e39786088138f2749d64e9e90e0f9902daa77c4b8b1f8ca926cba99b2ff5f12a)
+  URL_HASH SHA256=a9607c9215866bd425a725610c5e0f739eeb50887a57903df48891446ce6fb3c)
 set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
-

@@ -2,15 +2,14 @@
 
 This directory is reserved for vendored or submodule dependencies.
 
-Planned dependency:
+Pinned dependency:
 
 - `winlamb/`: rodrigocfd/winlamb pinned to commit `049da50724317b5c78eb6398477ae8649bf183bc`.
 
-The initial fetch failed in this environment because GitHub connections were reset. Retry with:
+If the submodule is missing in a fresh checkout, initialize it with:
 
 ```powershell
-git submodule add https://github.com/rodrigocfd/winlamb.git third_party/winlamb
-git -C third_party/winlamb checkout 049da50724317b5c78eb6398477ae8649bf183bc
-git add .gitmodules third_party/winlamb
+git submodule update --init --recursive
 ```
 
+The pinned commit currently uses root-level headers such as `wnd.h`, not a single `winlamb.hpp` umbrella header.
