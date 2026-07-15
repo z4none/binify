@@ -12,6 +12,7 @@ enum class ErrorCode {
   invalid_argument,
   config_invalid,
   config_missing,
+  config_io_error,
   command_name_empty,
   command_name_invalid_character,
   command_name_reserved,

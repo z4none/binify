@@ -20,6 +20,7 @@ add_library(binify_core STATIC
   src/core/text_encoding.cpp)
 add_library(binify::core ALIAS binify_core)
 target_include_directories(binify_core PUBLIC src)
+target_link_libraries(binify_core PUBLIC nlohmann_json::nlohmann_json)
 binify_apply_project_options(binify_core)
 
 add_library(binify_app STATIC
@@ -30,6 +31,7 @@ target_link_libraries(binify_app PUBLIC binify::core)
 binify_apply_project_options(binify_app)
 
 add_library(binify_windows STATIC
+  src/platform/windows/config_store.cpp
   src/platform/windows/platform.cpp)
 add_library(binify::windows ALIAS binify_windows)
 target_include_directories(binify_windows PUBLIC src)
@@ -48,6 +50,7 @@ enable_testing()
 add_executable(binify_unit_tests
   tests/unit/command_conflict_tests.cpp
   tests/unit/command_name_tests.cpp
+  tests/unit/config_serialization_tests.cpp
   tests/unit/config_model_tests.cpp
   tests/unit/creation_policy_tests.cpp
   tests/unit/error_tests.cpp
@@ -61,6 +64,7 @@ include(GoogleTest)
 gtest_discover_tests(binify_unit_tests)
 
 add_executable(binify_integration_tests
+  tests/integration/config_store_tests.cpp
   tests/integration/smoke_tests.cpp)
 target_link_libraries(binify_integration_tests PRIVATE binify::windows GTest::gtest_main)
 binify_apply_project_options(binify_integration_tests)
