@@ -33,6 +33,14 @@ std::wstring_view to_wstring(ErrorCode code) noexcept {
     return L"config_invalid";
   case ErrorCode::config_missing:
     return L"config_missing";
+  case ErrorCode::command_name_empty:
+    return L"command_name_empty";
+  case ErrorCode::command_name_invalid_character:
+    return L"command_name_invalid_character";
+  case ErrorCode::command_name_reserved:
+    return L"command_name_reserved";
+  case ErrorCode::command_name_invalid_suffix:
+    return L"command_name_invalid_suffix";
   case ErrorCode::path_invalid:
     return L"path_invalid";
   case ErrorCode::path_not_absolute:

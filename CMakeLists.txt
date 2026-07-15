@@ -11,6 +11,8 @@ include(CompilerOptions)
 include(Dependencies)
 
 add_library(binify_core STATIC
+  src/core/command_conflict.cpp
+  src/core/command_name.cpp
   src/core/config.cpp
   src/core/creation_policy.cpp
   src/core/error.cpp
@@ -44,6 +46,8 @@ binify_apply_project_options(binify)
 enable_testing()
 
 add_executable(binify_unit_tests
+  tests/unit/command_conflict_tests.cpp
+  tests/unit/command_name_tests.cpp
   tests/unit/config_model_tests.cpp
   tests/unit/creation_policy_tests.cpp
   tests/unit/error_tests.cpp
