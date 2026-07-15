@@ -49,6 +49,12 @@ std::wstring_view to_wstring(ErrorCode code) noexcept {
     return L"path_not_absolute";
   case ErrorCode::encoding_error:
     return L"encoding_error";
+  case ErrorCode::source_invalid:
+    return L"source_invalid";
+  case ErrorCode::link_creation_failed:
+    return L"link_creation_failed";
+  case ErrorCode::link_mode_unavailable:
+    return L"link_mode_unavailable";
   case ErrorCode::platform_error:
     return L"platform_error";
   }

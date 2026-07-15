@@ -11,6 +11,7 @@ include(CompilerOptions)
 include(Dependencies)
 
 add_library(binify_core STATIC
+  src/core/bat_wrapper.cpp
   src/core/command_conflict.cpp
   src/core/command_name.cpp
   src/core/config.cpp
@@ -24,6 +25,7 @@ target_link_libraries(binify_core PUBLIC nlohmann_json::nlohmann_json)
 binify_apply_project_options(binify_core)
 
 add_library(binify_app STATIC
+  src/app/add_command_creation.cpp
   src/app/application.cpp)
 add_library(binify::app ALIAS binify_app)
 target_include_directories(binify_app PUBLIC src)
@@ -32,6 +34,7 @@ binify_apply_project_options(binify_app)
 
 add_library(binify_windows STATIC
   src/platform/windows/config_store.cpp
+  src/platform/windows/link_service.cpp
   src/platform/windows/platform.cpp)
 add_library(binify::windows ALIAS binify_windows)
 target_include_directories(binify_windows PUBLIC src)
@@ -48,6 +51,8 @@ binify_apply_project_options(binify)
 enable_testing()
 
 add_executable(binify_unit_tests
+  tests/unit/add_command_creation_tests.cpp
+  tests/unit/bat_wrapper_tests.cpp
   tests/unit/command_conflict_tests.cpp
   tests/unit/command_name_tests.cpp
   tests/unit/config_serialization_tests.cpp
@@ -58,13 +63,14 @@ add_executable(binify_unit_tests
   tests/unit/result_tests.cpp
   tests/unit/smoke_tests.cpp
   tests/unit/text_encoding_tests.cpp)
-target_link_libraries(binify_unit_tests PRIVATE binify::core GTest::gtest_main)
+target_link_libraries(binify_unit_tests PRIVATE binify::app GTest::gtest_main)
 binify_apply_project_options(binify_unit_tests)
 include(GoogleTest)
 gtest_discover_tests(binify_unit_tests)
 
 add_executable(binify_integration_tests
   tests/integration/config_store_tests.cpp
+  tests/integration/link_service_tests.cpp
   tests/integration/smoke_tests.cpp)
 target_link_libraries(binify_integration_tests PRIVATE binify::windows GTest::gtest_main)
 binify_apply_project_options(binify_integration_tests)

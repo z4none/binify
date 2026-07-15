@@ -20,6 +20,9 @@ enum class ErrorCode {
   path_invalid,
   path_not_absolute,
   encoding_error,
+  source_invalid,
+  link_creation_failed,
+  link_mode_unavailable,
   platform_error
 };
 
