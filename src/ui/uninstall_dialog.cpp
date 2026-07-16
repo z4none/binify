@@ -33,12 +33,7 @@ UninstallWindow::UninstallWindow(RuntimeContext& runtime) : runtime_(runtime) {
     return 0;
   });
 
-  on_message(WM_DRAWITEM, [](wl::params params) -> LRESULT {
-    draw_modern_button(*reinterpret_cast<DRAWITEMSTRUCT*>(params.lParam));
-    return TRUE;
-  });
-
-  on_message({WM_CTLCOLORSTATIC, WM_CTLCOLORBTN}, [](wl::params params) -> LRESULT {
+  on_message(WM_CTLCOLORSTATIC, [](wl::params params) -> LRESULT {
     return reinterpret_cast<LRESULT>(transparent_control_background(reinterpret_cast<HDC>(params.wParam)));
   });
 

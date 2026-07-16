@@ -180,7 +180,7 @@ void make_modern_button(HWND button, ButtonRole role) noexcept {
   SetWindowLongPtrW(
     button,
     GWL_STYLE,
-    (style & ~BS_TYPEMASK & ~BS_DEFPUSHBUTTON) | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_TABSTOP);
+    (style & ~BS_TYPEMASK & ~BS_DEFPUSHBUTTON) | BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP);
   SetWindowPos(button, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
   EnableWindow(button, TRUE);
   InvalidateRect(button, nullptr, TRUE);
