@@ -15,7 +15,7 @@ constexpr int kIdCancel = 3004;
 UninstallWindow::UninstallWindow(RuntimeContext& runtime) : runtime_(runtime) {
   setup.wndClassEx.lpszClassName = L"BINIFY_UNINSTALL_WINDOW";
   setup.title = text::kUninstallTitle;
-  setup.size = {640, 380};
+  setup.size = scale_size_for_system_dpi(640, 380);
   setup.style |= WS_MINIMIZEBOX;
 
   on_message(WM_CREATE, [this](wl::wm::create) -> LRESULT {
@@ -38,6 +38,10 @@ UninstallWindow::UninstallWindow(RuntimeContext& runtime) : runtime_(runtime) {
     return TRUE;
   });
 
+  on_message({WM_CTLCOLORSTATIC, WM_CTLCOLORBTN}, [](wl::params params) -> LRESULT {
+    return reinterpret_cast<LRESULT>(transparent_control_background(reinterpret_cast<HDC>(params.wParam)));
+  });
+
   on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
     switch (command.control_id()) {
     case kIdCleanup:
@@ -57,6 +61,7 @@ void UninstallWindow::create_controls() {
 
   title_label_.create(this, -1, L"🗑  Uninstall cleanup", {s(24), s(18)}, {s(420), s(34)});
   apply_font(title_label_.hwnd(), theme_.title_font());
+  make_transparent_control(title_label_.hwnd());
   summary_label_.create(
     this,
     -1,
@@ -64,10 +69,13 @@ void UninstallWindow::create_controls() {
     {s(44), s(86)},
     {s(540), s(54)});
   apply_font(summary_label_.hwnd(), theme_.body_font());
+  make_transparent_control(summary_label_.hwnd());
   path_checkbox_.create(this, kIdPath, L"Remove Bin directory from current-user PATH", {s(44), s(184)}, {s(500), s(26)});
   apply_font(path_checkbox_.hwnd(), theme_.body_font());
+  make_transparent_control(path_checkbox_.hwnd());
   context_menu_checkbox_.create(this, kIdContextMenu, L"Remove Explorer context menu registration", {s(44), s(222)}, {s(500), s(26)});
   apply_font(context_menu_checkbox_.hwnd(), theme_.body_font());
+  make_transparent_control(context_menu_checkbox_.hwnd());
   cleanup_button_.create(this, kIdCleanup, L"🗑  Clean up", {s(410), s(302)}, {s(110), s(36)});
   apply_font(cleanup_button_.hwnd(), theme_.body_font());
   make_modern_button(cleanup_button_.hwnd(), ButtonRole::danger);

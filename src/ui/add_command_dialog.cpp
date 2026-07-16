@@ -33,7 +33,7 @@ AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::pat
   : runtime_(runtime), source_path_(std::move(source_path)) {
   setup.wndClassEx.lpszClassName = L"BINIFY_ADD_COMMAND_WINDOW";
   setup.title = text::kAddCommandTitle;
-  setup.size = {780, 560};
+  setup.size = scale_size_for_system_dpi(780, 560);
   setup.style |= WS_MINIMIZEBOX;
 
   on_message(WM_CREATE, [this](wl::wm::create) -> LRESULT {
@@ -55,6 +55,10 @@ AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::pat
   on_message(WM_DRAWITEM, [](wl::params params) -> LRESULT {
     draw_modern_button(*reinterpret_cast<DRAWITEMSTRUCT*>(params.lParam));
     return TRUE;
+  });
+
+  on_message({WM_CTLCOLORSTATIC, WM_CTLCOLORBTN}, [](wl::params params) -> LRESULT {
+    return reinterpret_cast<LRESULT>(transparent_control_background(reinterpret_cast<HDC>(params.wParam)));
   });
 
   on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
@@ -80,20 +84,25 @@ void AddCommandWindow::create_controls() {
 
   title_label_.create(this, -1, L"➕  Add command", {s(24), s(18)}, {s(420), s(34)});
   apply_font(title_label_.hwnd(), theme_.title_font());
+  make_transparent_control(title_label_.hwnd());
 
   source_label_.create(this, -1, L"Source executable", {s(44), s(88)}, {s(160), s(22)});
   apply_font(source_label_.hwnd(), theme_.body_font());
+  make_transparent_control(source_label_.hwnd());
   source_value_.create(this, -1, source_path_.wstring().c_str(), {s(44), s(118)}, {s(660), s(42)});
   apply_font(source_value_.hwnd(), theme_.small_font());
+  make_transparent_control(source_value_.hwnd());
 
   name_label_.create(this, -1, L"Command name", {s(44), s(208)}, {s(140), s(22)});
   apply_font(name_label_.hwnd(), theme_.body_font());
+  make_transparent_control(name_label_.hwnd());
   name_text_.create(this, kIdName, wl::textbox::type::NORMAL, {s(190), s(204)}, s(260), s(25));
   apply_font(name_text_.hwnd(), theme_.body_font());
   name_text_.set_text(default_command_name(source_path_));
 
   mode_label_.create(this, -1, L"Link mode", {s(44), s(252)}, {s(140), s(22)});
   apply_font(mode_label_.hwnd(), theme_.body_font());
+  make_transparent_control(mode_label_.hwnd());
   mode_combo_.create(this, kIdMode, {s(190), s(248)}, s(260), wl::combobox::sort::UNSORTED);
   apply_font(mode_combo_.hwnd(), theme_.body_font());
   mode_combo_.add({L"Auto", L"Symbolic Link", L"Hard Link", L"CMD Wrapper"});
@@ -101,8 +110,10 @@ void AddCommandWindow::create_controls() {
 
   mode_help_.create(this, -1, text::kLinkModeHelp, {s(190), s(286)}, {s(500), s(46)});
   apply_font(mode_help_.hwnd(), theme_.small_font());
+  make_transparent_control(mode_help_.hwnd());
   entry_preview_.create(this, -1, L"", {s(44), s(382)}, {s(680), s(44)});
   apply_font(entry_preview_.hwnd(), theme_.body_font());
+  make_transparent_control(entry_preview_.hwnd());
 
   create_button_.create(this, kIdCreate, L"✓  Create", {s(560), s(482)}, {s(100), s(36)});
   apply_font(create_button_.hwnd(), theme_.body_font());

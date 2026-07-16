@@ -1,6 +1,7 @@
 #include "ui/settings_dialog.h"
 
 #include <shlobj.h>
+#include <objbase.h>
 
 #include "ui/ui_text.h"
 
@@ -16,6 +17,7 @@ constexpr int kIdSave = 1006;
 constexpr int kIdCancel = 1007;
 
 std::filesystem::path choose_folder(HWND owner) {
+  const HRESULT initialized = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
   BROWSEINFOW browse_info{};
   browse_info.hwndOwner = owner;
   browse_info.lpszTitle = L"Select Bin directory";
@@ -23,12 +25,18 @@ std::filesystem::path choose_folder(HWND owner) {
 
   PIDLIST_ABSOLUTE item = SHBrowseForFolderW(&browse_info);
   if (item == nullptr) {
+    if (SUCCEEDED(initialized)) {
+      CoUninitialize();
+    }
     return {};
   }
 
   wchar_t path[MAX_PATH]{};
   const bool ok = SHGetPathFromIDListW(item, path) == TRUE;
   CoTaskMemFree(item);
+  if (SUCCEEDED(initialized)) {
+    CoUninitialize();
+  }
   return ok ? std::filesystem::path{path} : std::filesystem::path{};
 }
 
@@ -37,7 +45,7 @@ std::filesystem::path choose_folder(HWND owner) {
 SettingsWindow::SettingsWindow(RuntimeContext& runtime) : runtime_(runtime) {
   setup.wndClassEx.lpszClassName = L"BINIFY_SETTINGS_WINDOW";
   setup.title = text::kSettingsTitle;
-  setup.size = {760, 540};
+  setup.size = scale_size_for_system_dpi(760, 540);
   setup.style |= WS_MINIMIZEBOX;
 
   on_message(WM_CREATE, [this](wl::wm::create) -> LRESULT {
@@ -58,6 +66,10 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime) : runtime_(runtime) {
   on_message(WM_DRAWITEM, [](wl::params params) -> LRESULT {
     draw_modern_button(*reinterpret_cast<DRAWITEMSTRUCT*>(params.lParam));
     return TRUE;
+  });
+
+  on_message({WM_CTLCOLORSTATIC, WM_CTLCOLORBTN}, [](wl::params params) -> LRESULT {
+    return reinterpret_cast<LRESULT>(transparent_control_background(reinterpret_cast<HDC>(params.wParam)));
   });
 
   on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
@@ -85,9 +97,11 @@ void SettingsWindow::create_controls() {
 
   title_label_.create(this, -1, L"⚙  binify settings", {s(24), s(18)}, {s(420), s(34)});
   apply_font(title_label_.hwnd(), theme_.title_font());
+  make_transparent_control(title_label_.hwnd());
 
   bin_label_.create(this, -1, L"Bin directory", {s(44), s(88)}, {s(150), s(22)});
   apply_font(bin_label_.hwnd(), theme_.body_font());
+  make_transparent_control(bin_label_.hwnd());
   bin_text_.create(this, kIdBinText, wl::textbox::type::NORMAL, {s(44), s(116)}, s(500), s(25));
   apply_font(bin_text_.hwnd(), theme_.body_font());
   browse_button_.create(this, kIdBrowse, L"📁  Browse", {s(565), s(114)}, {s(130), s(32)});
@@ -96,11 +110,14 @@ void SettingsWindow::create_controls() {
 
   path_checkbox_.create(this, kIdPath, text::kPathToggle, {s(44), s(194)}, {s(520), s(26)});
   apply_font(path_checkbox_.hwnd(), theme_.body_font());
+  make_transparent_control(path_checkbox_.hwnd());
   context_menu_checkbox_.create(this, kIdContextMenu, text::kContextMenuToggle, {s(44), s(230)}, {s(560), s(26)});
   apply_font(context_menu_checkbox_.hwnd(), theme_.body_font());
+  make_transparent_control(context_menu_checkbox_.hwnd());
 
   help_label_.create(this, -1, L"Settings are saved for the current user. No administrator permission is required.", {s(44), s(326)}, {s(620), s(38)});
   apply_font(help_label_.hwnd(), theme_.small_font());
+  make_transparent_control(help_label_.hwnd());
   open_bin_button_.create(this, kIdOpenBin, L"📂  Open Bin", {s(44), s(380)}, {s(150), s(34)});
   apply_font(open_bin_button_.hwnd(), theme_.body_font());
   make_modern_button(open_bin_button_.hwnd(), ButtonRole::secondary);

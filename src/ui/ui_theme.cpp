@@ -16,6 +16,27 @@ constexpr COLORREF kSecondaryBorder = RGB(0xC9, 0xD1, 0xDE);
 constexpr COLORREF kText = RGB(0x1F, 0x29, 0x37);
 constexpr COLORREF kTextInverse = RGB(0xFF, 0xFF, 0xFF);
 
+UINT system_dpi() noexcept {
+  using GetDpiForSystemFn = UINT(WINAPI*)();
+  const HMODULE user32 = GetModuleHandleW(L"user32.dll");
+  if (user32 != nullptr) {
+    const auto get_dpi_for_system = reinterpret_cast<GetDpiForSystemFn>(GetProcAddress(user32, "GetDpiForSystem"));
+    if (get_dpi_for_system != nullptr) {
+      const UINT dpi = get_dpi_for_system();
+      if (dpi != 0) {
+        return dpi;
+      }
+    }
+  }
+
+  HDC dc = GetDC(nullptr);
+  const int dpi = dc != nullptr ? GetDeviceCaps(dc, LOGPIXELSX) : 96;
+  if (dc != nullptr) {
+    ReleaseDC(nullptr, dc);
+  }
+  return dpi > 0 ? static_cast<UINT>(dpi) : 96U;
+}
+
 UINT dpi_for_window(HWND window) noexcept {
   using GetDpiForWindowFn = UINT(WINAPI*)(HWND);
   const HMODULE user32 = GetModuleHandleW(L"user32.dll");
@@ -53,7 +74,7 @@ HFONT create_font(UINT dpi, int point_size, LONG weight) {
     CLIP_DEFAULT_PRECIS,
     CLEARTYPE_QUALITY,
     DEFAULT_PITCH | FF_DONTCARE,
-    L"Segoe UI Variable");
+    L"Segoe UI");
 }
 
 ButtonRole button_role(HWND button) noexcept {
@@ -141,10 +162,30 @@ void apply_font(HWND control, HFONT font) noexcept {
   SendMessageW(control, WM_SETFONT, reinterpret_cast<WPARAM>(font), TRUE);
 }
 
+int scale_for_system_dpi(int value) noexcept {
+  return MulDiv(value, static_cast<int>(system_dpi()), 96);
+}
+
+SIZE scale_size_for_system_dpi(int width, int height) noexcept {
+  return {scale_for_system_dpi(width), scale_for_system_dpi(height)};
+}
+
+void make_transparent_control(HWND control) noexcept {
+  SetWindowLongPtrW(control, GWL_EXSTYLE, GetWindowLongPtrW(control, GWL_EXSTYLE) | WS_EX_TRANSPARENT);
+}
+
 void make_modern_button(HWND button, ButtonRole role) noexcept {
   SetWindowLongPtrW(button, GWLP_USERDATA, static_cast<LONG_PTR>(role));
   const auto style = GetWindowLongPtrW(button, GWL_STYLE);
   SetWindowLongPtrW(button, GWL_STYLE, (style | BS_OWNERDRAW) & ~BS_DEFPUSHBUTTON);
+  SetWindowPos(button, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+  InvalidateRect(button, nullptr, TRUE);
+}
+
+HBRUSH transparent_control_background(HDC dc) noexcept {
+  SetBkMode(dc, TRANSPARENT);
+  SetTextColor(dc, kText);
+  return static_cast<HBRUSH>(GetStockObject(HOLLOW_BRUSH));
 }
 
 void draw_modern_button(const DRAWITEMSTRUCT& item) {
