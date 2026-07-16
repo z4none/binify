@@ -36,6 +36,7 @@ private:
   wl::checkbox context_menu_checkbox_;
   wl::label help_label_;
   wl::button open_bin_button_;
+  HWND hello_button_ = nullptr;
   wl::button save_button_;
   wl::button cancel_button_;
 };
