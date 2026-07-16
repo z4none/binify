@@ -1,0 +1,91 @@
+#include "ui/ui_runtime.h"
+
+#include <system_error>
+
+#include "core/error.h"
+
+namespace binify::ui {
+
+core::Result<std::vector<core::DirectoryEntry>> WindowsDirectoryListing::list_entries(
+  const std::filesystem::path& directory) const {
+  std::vector<core::DirectoryEntry> entries;
+  std::error_code error_code;
+
+  if (!std::filesystem::exists(directory, error_code)) {
+    if (error_code) {
+      return core::make_error(core::ErrorCode::path_invalid, L"Failed to inspect Bin directory.", error_code.value(), directory.wstring());
+    }
+    return entries;
+  }
+
+  for (const auto& entry : std::filesystem::directory_iterator(directory, error_code)) {
+    if (error_code) {
+      return core::make_error(core::ErrorCode::path_invalid, L"Failed to list Bin directory.", error_code.value(), directory.wstring());
+    }
+    entries.push_back(core::DirectoryEntry{
+      .filename = entry.path().filename().wstring(),
+      .path = entry.path(),
+    });
+  }
+
+  return entries;
+}
+
+RuntimeContext::RuntimeContext(std::filesystem::path config_path, std::filesystem::path executable_path)
+  : config_store(std::move(config_path)),
+    settings_workflow(config_store, path_service, context_menu_service),
+    add_command_workflow(link_service, directory_listing),
+    uninstall_workflow(path_service, context_menu_service),
+    executable_path_(std::move(executable_path)) {}
+
+const std::filesystem::path& RuntimeContext::executable_path() const noexcept {
+  return executable_path_;
+}
+
+std::wstring error_message(const core::Error& error) {
+  std::wstring message{core::to_wstring(error.code)};
+  if (!error.technical_message.empty()) {
+    message += L"\r\n";
+    message += error.technical_message;
+  }
+  if (error.native_code) {
+    message += L"\r\nNative error: ";
+    message += std::to_wstring(*error.native_code);
+  }
+  if (error.path) {
+    message += L"\r\nPath: ";
+    message += *error.path;
+  }
+  return message;
+}
+
+std::filesystem::path current_executable_path() {
+  std::wstring buffer(MAX_PATH, L'\0');
+  DWORD copied = 0;
+  for (;;) {
+    copied = GetModuleFileNameW(nullptr, buffer.data(), static_cast<DWORD>(buffer.size()));
+    if (copied == 0) {
+      return {};
+    }
+    if (copied < buffer.size() - 1) {
+      buffer.resize(copied);
+      return buffer;
+    }
+    buffer.resize(buffer.size() * 2);
+  }
+}
+
+core::Result<std::filesystem::path> default_config_path() {
+  return platform::windows::default_config_path();
+}
+
+void show_error(HWND owner, const core::Error& error) {
+  const auto message = error_message(error);
+  MessageBoxW(owner, message.c_str(), L"binify error", MB_ICONERROR | MB_OK);
+}
+
+void show_info(HWND owner, const std::wstring& message) {
+  MessageBoxW(owner, message.c_str(), L"binify", MB_ICONINFORMATION | MB_OK);
+}
+
+} // namespace binify::ui

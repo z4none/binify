@@ -1,13 +1,23 @@
 #include <windows.h>
+#include <shellapi.h>
 
-#include "app/application.h"
+#include <string>
+#include <vector>
 
-int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
-  binify::app::Application application;
-  const auto result = application.run();
-  if (!result) {
-    return 1;
+#include "ui/ui_application.h"
+
+int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int command_show) {
+  int argc = 0;
+  PWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+  std::vector<std::wstring> arguments;
+  if (argv != nullptr) {
+    arguments.reserve(static_cast<std::size_t>(argc));
+    for (int index = 0; index < argc; ++index) {
+      arguments.emplace_back(argv[index]);
+    }
+    LocalFree(argv);
   }
-  return result.value();
-}
 
+  return binify::ui::run_ui(instance, command_show, arguments);
+}

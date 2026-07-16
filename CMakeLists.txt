@@ -51,10 +51,24 @@ target_link_libraries(binify_windows PUBLIC binify::app)
 target_link_libraries(binify_windows PRIVATE advapi32 shell32 user32)
 binify_apply_project_options(binify_windows)
 
+add_library(binify_ui STATIC
+  src/ui/add_command_dialog.cpp
+  src/ui/conflict_dialog.cpp
+  src/ui/result_dialog.cpp
+  src/ui/settings_dialog.cpp
+  src/ui/ui_application.cpp
+  src/ui/ui_runtime.cpp
+  src/ui/uninstall_dialog.cpp)
+add_library(binify::ui ALIAS binify_ui)
+target_include_directories(binify_ui PUBLIC src)
+target_link_libraries(binify_ui PUBLIC binify::windows winlamb)
+target_link_libraries(binify_ui PRIVATE shell32 ole32 user32)
+binify_apply_project_options(binify_ui)
+
 add_executable(binify WIN32
   src/main.cpp
   resources/binify.rc)
-target_link_libraries(binify PRIVATE binify::windows winlamb)
+target_link_libraries(binify PRIVATE binify::ui shell32)
 binify_apply_project_options(binify)
 
 enable_testing()
