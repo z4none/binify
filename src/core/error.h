@@ -19,6 +19,7 @@ enum class ErrorCode {
   command_name_invalid_suffix,
   path_invalid,
   path_not_absolute,
+  path_registry_error,
   encoding_error,
   source_invalid,
   link_creation_failed,

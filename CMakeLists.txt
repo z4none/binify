@@ -18,6 +18,7 @@ add_library(binify_core STATIC
   src/core/creation_policy.cpp
   src/core/error.cpp
   src/core/path_utils.cpp
+  src/core/path_value.cpp
   src/core/text_encoding.cpp)
 add_library(binify::core ALIAS binify_core)
 target_include_directories(binify_core PUBLIC src)
@@ -35,7 +36,9 @@ binify_apply_project_options(binify_app)
 
 add_library(binify_windows STATIC
   src/platform/windows/config_store.cpp
+  src/platform/windows/environment_broadcast.cpp
   src/platform/windows/link_service.cpp
+  src/platform/windows/path_service.cpp
   src/platform/windows/platform.cpp)
 add_library(binify::windows ALIAS binify_windows)
 target_include_directories(binify_windows PUBLIC src)
@@ -62,6 +65,7 @@ add_executable(binify_unit_tests
   tests/unit/entry_transaction_tests.cpp
   tests/unit/error_tests.cpp
   tests/unit/path_utils_tests.cpp
+  tests/unit/path_value_tests.cpp
   tests/unit/result_tests.cpp
   tests/unit/smoke_tests.cpp
   tests/unit/text_encoding_tests.cpp)
@@ -72,6 +76,7 @@ gtest_discover_tests(binify_unit_tests)
 
 add_executable(binify_integration_tests
   tests/integration/config_store_tests.cpp
+  tests/integration/path_service_tests.cpp
   tests/integration/link_service_tests.cpp
   tests/integration/smoke_tests.cpp)
 target_link_libraries(binify_integration_tests PRIVATE binify::windows GTest::gtest_main)

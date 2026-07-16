@@ -47,6 +47,8 @@ std::wstring_view to_wstring(ErrorCode code) noexcept {
     return L"path_invalid";
   case ErrorCode::path_not_absolute:
     return L"path_not_absolute";
+  case ErrorCode::path_registry_error:
+    return L"path_registry_error";
   case ErrorCode::encoding_error:
     return L"encoding_error";
   case ErrorCode::source_invalid:
