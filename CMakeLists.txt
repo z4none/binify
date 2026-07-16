@@ -15,6 +15,7 @@ add_library(binify_core STATIC
   src/core/command_conflict.cpp
   src/core/command_name.cpp
   src/core/config.cpp
+  src/core/context_menu_command.cpp
   src/core/creation_policy.cpp
   src/core/error.cpp
   src/core/path_utils.cpp
@@ -36,6 +37,7 @@ binify_apply_project_options(binify_app)
 
 add_library(binify_windows STATIC
   src/platform/windows/config_store.cpp
+  src/platform/windows/context_menu_service.cpp
   src/platform/windows/environment_broadcast.cpp
   src/platform/windows/link_service.cpp
   src/platform/windows/path_service.cpp
@@ -61,6 +63,7 @@ add_executable(binify_unit_tests
   tests/unit/command_name_tests.cpp
   tests/unit/config_serialization_tests.cpp
   tests/unit/config_model_tests.cpp
+  tests/unit/context_menu_command_tests.cpp
   tests/unit/creation_policy_tests.cpp
   tests/unit/entry_transaction_tests.cpp
   tests/unit/error_tests.cpp
@@ -76,6 +79,7 @@ gtest_discover_tests(binify_unit_tests)
 
 add_executable(binify_integration_tests
   tests/integration/config_store_tests.cpp
+  tests/integration/context_menu_service_tests.cpp
   tests/integration/path_service_tests.cpp
   tests/integration/link_service_tests.cpp
   tests/integration/smoke_tests.cpp)
