@@ -45,9 +45,11 @@ UninstallWindow::UninstallWindow(RuntimeContext& runtime) : runtime_(runtime) {
   on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
     switch (command.control_id()) {
     case kIdCleanup:
+      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Uninstall cleanup button clicked."));
       run_cleanup();
       return 0;
     case kIdCancel:
+      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Uninstall cancel clicked."));
       DestroyWindow(hwnd());
       return 0;
     default:

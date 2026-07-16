@@ -75,15 +75,19 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime) : runtime_(runtime) {
   on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
     switch (command.control_id()) {
     case kIdBrowse:
+      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Browse clicked."));
       browse_bin_directory();
       return 0;
     case kIdOpenBin:
+      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Open Bin clicked."));
       open_bin_directory();
       return 0;
     case kIdSave:
+      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Save clicked."));
       save_config();
       return 0;
     case kIdCancel:
+      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Cancel clicked."));
       DestroyWindow(hwnd());
       return 0;
     default:

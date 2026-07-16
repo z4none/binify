@@ -68,9 +68,11 @@ AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::pat
       update_entry_preview();
       return 0;
     case kIdCreate:
+      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Add command Create clicked."));
       create_command();
       return 0;
     case kIdCancel:
+      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Add command Cancel clicked."));
       DestroyWindow(hwnd());
       return 0;
     default:

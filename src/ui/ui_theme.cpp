@@ -177,8 +177,12 @@ void make_transparent_control(HWND control) noexcept {
 void make_modern_button(HWND button, ButtonRole role) noexcept {
   SetWindowLongPtrW(button, GWLP_USERDATA, static_cast<LONG_PTR>(role));
   const auto style = GetWindowLongPtrW(button, GWL_STYLE);
-  SetWindowLongPtrW(button, GWL_STYLE, (style | BS_OWNERDRAW) & ~BS_DEFPUSHBUTTON);
+  SetWindowLongPtrW(
+    button,
+    GWL_STYLE,
+    (style & ~BS_TYPEMASK & ~BS_DEFPUSHBUTTON) | BS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_TABSTOP);
   SetWindowPos(button, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+  EnableWindow(button, TRUE);
   InvalidateRect(button, nullptr, TRUE);
 }
 
