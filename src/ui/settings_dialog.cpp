@@ -1,7 +1,6 @@
 #include "ui/settings_dialog.h"
 
 #include <shlobj.h>
-#include <shellapi.h>
 
 #include "ui/ui_text.h"
 
@@ -113,6 +112,7 @@ void SettingsWindow::save_config() {
     return;
   }
 
+  static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings saved."));
   show_info(hwnd(), L"Settings saved successfully.");
 }
 
@@ -130,10 +130,9 @@ void SettingsWindow::open_bin_directory() const {
     return;
   }
 
-  const auto result = reinterpret_cast<INT_PTR>(
-    ShellExecuteW(hwnd(), L"open", path.c_str(), nullptr, nullptr, SW_SHOWNORMAL));
-  if (result <= 32) {
-    MessageBoxW(hwnd(), L"Failed to open the Bin directory.", text::kAppTitle, MB_ICONERROR | MB_OK);
+  const auto opened = runtime_.shell_service.open_directory(path);
+  if (!opened) {
+    show_error(hwnd(), opened.error());
   }
 }
 

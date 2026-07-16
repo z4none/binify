@@ -11,8 +11,10 @@
 #include "app/uninstall_workflow.h"
 #include "platform/windows/config_store.h"
 #include "platform/windows/context_menu_service.h"
+#include "platform/windows/file_logger.h"
 #include "platform/windows/link_service.h"
 #include "platform/windows/path_service.h"
+#include "platform/windows/shell_service.h"
 
 namespace binify::ui {
 
@@ -24,7 +26,10 @@ public:
 
 class RuntimeContext final {
 public:
-  RuntimeContext(std::filesystem::path config_path, std::filesystem::path executable_path);
+  RuntimeContext(
+    std::filesystem::path config_path,
+    std::filesystem::path log_directory,
+    std::filesystem::path executable_path);
   RuntimeContext(const RuntimeContext&) = delete;
   RuntimeContext& operator=(const RuntimeContext&) = delete;
 
@@ -34,6 +39,8 @@ public:
   platform::windows::RegistryPathService path_service;
   platform::windows::RegistryContextMenuService context_menu_service;
   platform::windows::WindowsLinkService link_service;
+  platform::windows::WindowsShellService shell_service;
+  platform::windows::FileLogger logger;
   WindowsDirectoryListing directory_listing;
   app::SettingsWorkflow settings_workflow;
   app::AddCommandWorkflow add_command_workflow;
@@ -46,6 +53,7 @@ private:
 [[nodiscard]] std::wstring error_message(const core::Error& error);
 [[nodiscard]] std::filesystem::path current_executable_path();
 [[nodiscard]] core::Result<std::filesystem::path> default_config_path();
+[[nodiscard]] core::Result<std::filesystem::path> default_log_directory();
 void show_error(HWND owner, const core::Error& error);
 void show_info(HWND owner, const std::wstring& message);
 

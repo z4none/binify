@@ -162,6 +162,7 @@ void AddCommandWindow::create_command() {
     return;
   }
 
+  static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Command entry created."));
   show_add_success(hwnd(), result.value());
 }
 

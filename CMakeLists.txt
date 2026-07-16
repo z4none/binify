@@ -42,9 +42,11 @@ add_library(binify_windows STATIC
   src/platform/windows/config_store.cpp
   src/platform/windows/context_menu_service.cpp
   src/platform/windows/environment_broadcast.cpp
+  src/platform/windows/file_logger.cpp
   src/platform/windows/link_service.cpp
   src/platform/windows/path_service.cpp
-  src/platform/windows/platform.cpp)
+  src/platform/windows/platform.cpp
+  src/platform/windows/shell_service.cpp)
 add_library(binify::windows ALIAS binify_windows)
 target_include_directories(binify_windows PUBLIC src)
 target_link_libraries(binify_windows PUBLIC binify::app)
@@ -100,7 +102,9 @@ gtest_discover_tests(binify_unit_tests)
 add_executable(binify_integration_tests
   tests/integration/config_store_tests.cpp
   tests/integration/context_menu_service_tests.cpp
+  tests/integration/file_logger_tests.cpp
   tests/integration/path_service_tests.cpp
+  tests/integration/shell_service_tests.cpp
   tests/integration/link_service_tests.cpp
   tests/integration/smoke_tests.cpp)
 target_link_libraries(binify_integration_tests PRIVATE binify::windows GTest::gtest_main)

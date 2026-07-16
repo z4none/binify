@@ -77,6 +77,7 @@ void UninstallWindow::run_cleanup() {
     return;
   }
 
+  static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Uninstall cleanup completed."));
   std::wstring message = L"Cleanup completed.";
   message += cleaned.value().path_removed ? L"\r\nPATH entry removed." : L"\r\nPATH entry unchanged.";
   message += cleaned.value().context_menu_removed ? L"\r\nContext menu removed." : L"\r\nContext menu unchanged.";

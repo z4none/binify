@@ -31,8 +31,12 @@ core::Result<std::vector<core::DirectoryEntry>> WindowsDirectoryListing::list_en
   return entries;
 }
 
-RuntimeContext::RuntimeContext(std::filesystem::path config_path, std::filesystem::path executable_path)
+RuntimeContext::RuntimeContext(
+  std::filesystem::path config_path,
+  std::filesystem::path log_directory,
+  std::filesystem::path executable_path)
   : config_store(std::move(config_path)),
+    logger(platform::windows::FileLoggerOptions{.log_directory = std::move(log_directory)}),
     settings_workflow(config_store, path_service, context_menu_service),
     add_command_workflow(link_service, directory_listing),
     uninstall_workflow(path_service, context_menu_service),
@@ -77,6 +81,10 @@ std::filesystem::path current_executable_path() {
 
 core::Result<std::filesystem::path> default_config_path() {
   return platform::windows::default_config_path();
+}
+
+core::Result<std::filesystem::path> default_log_directory() {
+  return platform::windows::default_log_directory();
 }
 
 void show_error(HWND owner, const core::Error& error) {

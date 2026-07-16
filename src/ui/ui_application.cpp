@@ -29,8 +29,14 @@ int run_ui(HINSTANCE instance, int command_show, const std::vector<std::wstring>
       show_error(nullptr, config_path.error());
       return 1;
     }
+    auto log_directory = default_log_directory();
+    if (!log_directory) {
+      show_error(nullptr, log_directory.error());
+      return 1;
+    }
 
-    RuntimeContext runtime{config_path.value(), current_executable_path()};
+    RuntimeContext runtime{config_path.value(), log_directory.value(), current_executable_path()};
+    static_cast<void>(runtime.logger.write(app::LogLevel::info, L"binify UI started."));
 
     if (arguments.size() >= 3 && is_option(arguments[1], L"--add")) {
       AddCommandWindow window{runtime, arguments[2]};
