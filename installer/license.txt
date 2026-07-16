@@ -1,0 +1,10 @@
+binify License Notice
+
+Copyright (c) 2026 binify contributors. All rights reserved.
+
+This preview build is provided for evaluation and internal use. Do not
+redistribute it unless the project owner has provided a separate license
+or distribution agreement.
+
+Third-party notices are installed under the "licenses" directory when
+available.
