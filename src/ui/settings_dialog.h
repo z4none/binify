@@ -4,6 +4,7 @@
 #include <shellapi.h>
 
 #include "ui/ui_runtime.h"
+#include "ui/ui_theme.h"
 
 #include "button.h"
 #include "checkbox.h"
@@ -19,12 +20,15 @@ public:
 
 private:
   void create_controls();
+  void draw(HDC dc) const;
   void load_config();
   void save_config();
   void browse_bin_directory();
   void open_bin_directory() const;
 
   RuntimeContext& runtime_;
+  Theme theme_;
+  wl::label title_label_;
   wl::label bin_label_;
   wl::textbox bin_text_;
   wl::button browse_button_;

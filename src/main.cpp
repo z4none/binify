@@ -5,8 +5,11 @@
 #include <vector>
 
 #include "ui/ui_application.h"
+#include "ui/ui_theme.h"
 
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int command_show) {
+  binify::ui::enable_process_dpi_awareness();
+
   int argc = 0;
   PWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
 

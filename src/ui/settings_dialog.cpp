@@ -37,13 +37,27 @@ std::filesystem::path choose_folder(HWND owner) {
 SettingsWindow::SettingsWindow(RuntimeContext& runtime) : runtime_(runtime) {
   setup.wndClassEx.lpszClassName = L"BINIFY_SETTINGS_WINDOW";
   setup.title = text::kSettingsTitle;
-  setup.size = {620, 320};
+  setup.size = {760, 540};
   setup.style |= WS_MINIMIZEBOX;
 
   on_message(WM_CREATE, [this](wl::wm::create) -> LRESULT {
+    theme_.initialize(hwnd());
     create_controls();
     load_config();
     return 0;
+  });
+
+  on_message(WM_PAINT, [this](wl::wm::paint) -> LRESULT {
+    PAINTSTRUCT paint{};
+    HDC dc = BeginPaint(hwnd(), &paint);
+    draw(dc);
+    EndPaint(hwnd(), &paint);
+    return 0;
+  });
+
+  on_message(WM_DRAWITEM, [](wl::params params) -> LRESULT {
+    draw_modern_button(*reinterpret_cast<DRAWITEMSTRUCT*>(params.lParam));
+    return TRUE;
   });
 
   on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
@@ -67,17 +81,49 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime) : runtime_(runtime) {
 }
 
 void SettingsWindow::create_controls() {
-  bin_label_.create(this, -1, L"Bin directory", {20, 24}, {120, 20});
-  bin_text_.create(this, kIdBinText, wl::textbox::type::NORMAL, {140, 20}, 340);
-  browse_button_.create(this, kIdBrowse, text::kBrowse, {500, 19}, {90, 24});
+  const auto s = [this](int value) { return theme_.scale(value); };
 
-  path_checkbox_.create(this, kIdPath, text::kPathToggle, {140, 58}, {380, 24});
-  context_menu_checkbox_.create(this, kIdContextMenu, text::kContextMenuToggle, {140, 90}, {420, 24});
+  title_label_.create(this, -1, L"⚙  binify settings", {s(24), s(18)}, {s(420), s(34)});
+  apply_font(title_label_.hwnd(), theme_.title_font());
 
-  help_label_.create(this, -1, L"Settings are saved for the current user. No administrator permission is required.", {20, 132}, {560, 40});
-  open_bin_button_.create(this, kIdOpenBin, text::kOpenBin, {140, 190}, {150, 28});
-  save_button_.create(this, kIdSave, text::kSave, {380, 230}, {90, 28});
-  cancel_button_.create(this, kIdCancel, text::kCancel, {500, 230}, {90, 28});
+  bin_label_.create(this, -1, L"Bin directory", {s(44), s(88)}, {s(150), s(22)});
+  apply_font(bin_label_.hwnd(), theme_.body_font());
+  bin_text_.create(this, kIdBinText, wl::textbox::type::NORMAL, {s(44), s(116)}, s(500), s(25));
+  apply_font(bin_text_.hwnd(), theme_.body_font());
+  browse_button_.create(this, kIdBrowse, L"📁  Browse", {s(565), s(114)}, {s(130), s(32)});
+  apply_font(browse_button_.hwnd(), theme_.body_font());
+  make_modern_button(browse_button_.hwnd(), ButtonRole::secondary);
+
+  path_checkbox_.create(this, kIdPath, text::kPathToggle, {s(44), s(194)}, {s(520), s(26)});
+  apply_font(path_checkbox_.hwnd(), theme_.body_font());
+  context_menu_checkbox_.create(this, kIdContextMenu, text::kContextMenuToggle, {s(44), s(230)}, {s(560), s(26)});
+  apply_font(context_menu_checkbox_.hwnd(), theme_.body_font());
+
+  help_label_.create(this, -1, L"Settings are saved for the current user. No administrator permission is required.", {s(44), s(326)}, {s(620), s(38)});
+  apply_font(help_label_.hwnd(), theme_.small_font());
+  open_bin_button_.create(this, kIdOpenBin, L"📂  Open Bin", {s(44), s(380)}, {s(150), s(34)});
+  apply_font(open_bin_button_.hwnd(), theme_.body_font());
+  make_modern_button(open_bin_button_.hwnd(), ButtonRole::secondary);
+
+  save_button_.create(this, kIdSave, L"✓  Save", {s(550), s(462)}, {s(90), s(36)});
+  apply_font(save_button_.hwnd(), theme_.body_font());
+  make_modern_button(save_button_.hwnd(), ButtonRole::primary);
+  cancel_button_.create(this, kIdCancel, text::kCancel, {s(650), s(462)}, {s(82), s(36)});
+  apply_font(cancel_button_.hwnd(), theme_.body_font());
+  make_modern_button(cancel_button_.hwnd(), ButtonRole::secondary);
+}
+
+void SettingsWindow::draw(HDC dc) const {
+  const auto s = [this](int value) { return theme_.scale(value); };
+  draw_window_background(hwnd(), dc, RGB(0xF6, 0xF8, 0xFB));
+  draw_panel(dc, {s(24), s(72), s(720), s(160)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
+  draw_panel(dc, {s(24), s(178), s(720), s(278)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
+  draw_panel(dc, {s(24), s(302), s(720), s(426)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
+
+  RECT action_bar{s(0), s(444), s(760), s(540)};
+  HBRUSH brush = CreateSolidBrush(RGB(0xF0, 0xF3, 0xF8));
+  FillRect(dc, &action_bar, brush);
+  DeleteObject(brush);
 }
 
 void SettingsWindow::load_config() {

@@ -6,6 +6,7 @@
 #include <shellapi.h>
 
 #include "ui/ui_runtime.h"
+#include "ui/ui_theme.h"
 
 #include "button.h"
 #include "combobox.h"
@@ -21,15 +22,18 @@ public:
 
 private:
   void create_controls();
+  void draw(HDC dc) const;
   void load_config();
   void update_entry_preview();
   void create_command();
   [[nodiscard]] core::LinkMode selected_link_mode() const;
 
   RuntimeContext& runtime_;
+  Theme theme_;
   std::filesystem::path source_path_;
   core::Config config_;
 
+  wl::label title_label_;
   wl::label source_label_;
   wl::label source_value_;
   wl::label name_label_;

@@ -33,14 +33,28 @@ AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::pat
   : runtime_(runtime), source_path_(std::move(source_path)) {
   setup.wndClassEx.lpszClassName = L"BINIFY_ADD_COMMAND_WINDOW";
   setup.title = text::kAddCommandTitle;
-  setup.size = {680, 360};
+  setup.size = {780, 560};
   setup.style |= WS_MINIMIZEBOX;
 
   on_message(WM_CREATE, [this](wl::wm::create) -> LRESULT {
+    theme_.initialize(hwnd());
     create_controls();
     load_config();
     update_entry_preview();
     return 0;
+  });
+
+  on_message(WM_PAINT, [this](wl::wm::paint) -> LRESULT {
+    PAINTSTRUCT paint{};
+    HDC dc = BeginPaint(hwnd(), &paint);
+    draw(dc);
+    EndPaint(hwnd(), &paint);
+    return 0;
+  });
+
+  on_message(WM_DRAWITEM, [](wl::params params) -> LRESULT {
+    draw_modern_button(*reinterpret_cast<DRAWITEMSTRUCT*>(params.lParam));
+    return TRUE;
   });
 
   on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
@@ -62,23 +76,53 @@ AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::pat
 }
 
 void AddCommandWindow::create_controls() {
-  source_label_.create(this, -1, L"Source", {20, 24}, {90, 20});
-  source_value_.create(this, -1, source_path_.wstring().c_str(), {120, 24}, {520, 40});
+  const auto s = [this](int value) { return theme_.scale(value); };
 
-  name_label_.create(this, -1, L"Command name", {20, 82}, {100, 20});
-  name_text_.create(this, kIdName, wl::textbox::type::NORMAL, {140, 78}, 260);
+  title_label_.create(this, -1, L"➕  Add command", {s(24), s(18)}, {s(420), s(34)});
+  apply_font(title_label_.hwnd(), theme_.title_font());
+
+  source_label_.create(this, -1, L"Source executable", {s(44), s(88)}, {s(160), s(22)});
+  apply_font(source_label_.hwnd(), theme_.body_font());
+  source_value_.create(this, -1, source_path_.wstring().c_str(), {s(44), s(118)}, {s(660), s(42)});
+  apply_font(source_value_.hwnd(), theme_.small_font());
+
+  name_label_.create(this, -1, L"Command name", {s(44), s(208)}, {s(140), s(22)});
+  apply_font(name_label_.hwnd(), theme_.body_font());
+  name_text_.create(this, kIdName, wl::textbox::type::NORMAL, {s(190), s(204)}, s(260), s(25));
+  apply_font(name_text_.hwnd(), theme_.body_font());
   name_text_.set_text(default_command_name(source_path_));
 
-  mode_label_.create(this, -1, L"Link mode", {20, 122}, {100, 20});
-  mode_combo_.create(this, kIdMode, {140, 118}, 220, wl::combobox::sort::UNSORTED);
+  mode_label_.create(this, -1, L"Link mode", {s(44), s(252)}, {s(140), s(22)});
+  apply_font(mode_label_.hwnd(), theme_.body_font());
+  mode_combo_.create(this, kIdMode, {s(190), s(248)}, s(260), wl::combobox::sort::UNSORTED);
+  apply_font(mode_combo_.hwnd(), theme_.body_font());
   mode_combo_.add({L"Auto", L"Symbolic Link", L"Hard Link", L"CMD Wrapper"});
   mode_combo_.select(0);
 
-  mode_help_.create(this, -1, text::kLinkModeHelp, {140, 154}, {480, 44});
-  entry_preview_.create(this, -1, L"", {140, 210}, {480, 40});
+  mode_help_.create(this, -1, text::kLinkModeHelp, {s(190), s(286)}, {s(500), s(46)});
+  apply_font(mode_help_.hwnd(), theme_.small_font());
+  entry_preview_.create(this, -1, L"", {s(44), s(382)}, {s(680), s(44)});
+  apply_font(entry_preview_.hwnd(), theme_.body_font());
 
-  create_button_.create(this, kIdCreate, text::kCreate, {440, 270}, {90, 28});
-  cancel_button_.create(this, kIdCancel, text::kCancel, {550, 270}, {90, 28});
+  create_button_.create(this, kIdCreate, L"✓  Create", {s(560), s(482)}, {s(100), s(36)});
+  apply_font(create_button_.hwnd(), theme_.body_font());
+  make_modern_button(create_button_.hwnd(), ButtonRole::primary);
+  cancel_button_.create(this, kIdCancel, text::kCancel, {s(674), s(482)}, {s(82), s(36)});
+  apply_font(cancel_button_.hwnd(), theme_.body_font());
+  make_modern_button(cancel_button_.hwnd(), ButtonRole::secondary);
+}
+
+void AddCommandWindow::draw(HDC dc) const {
+  const auto s = [this](int value) { return theme_.scale(value); };
+  draw_window_background(hwnd(), dc, RGB(0xF6, 0xF8, 0xFB));
+  draw_panel(dc, {s(24), s(72), s(744), s(172)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
+  draw_panel(dc, {s(24), s(192), s(744), s(342)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
+  draw_panel(dc, {s(24), s(366), s(744), s(440)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
+
+  RECT action_bar{s(0), s(464), s(780), s(560)};
+  HBRUSH brush = CreateSolidBrush(RGB(0xF0, 0xF3, 0xF8));
+  FillRect(dc, &action_bar, brush);
+  DeleteObject(brush);
 }
 
 void AddCommandWindow::load_config() {

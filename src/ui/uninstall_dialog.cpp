@@ -15,13 +15,27 @@ constexpr int kIdCancel = 3004;
 UninstallWindow::UninstallWindow(RuntimeContext& runtime) : runtime_(runtime) {
   setup.wndClassEx.lpszClassName = L"BINIFY_UNINSTALL_WINDOW";
   setup.title = text::kUninstallTitle;
-  setup.size = {560, 260};
+  setup.size = {640, 380};
   setup.style |= WS_MINIMIZEBOX;
 
   on_message(WM_CREATE, [this](wl::wm::create) -> LRESULT {
+    theme_.initialize(hwnd());
     create_controls();
     load_config();
     return 0;
+  });
+
+  on_message(WM_PAINT, [this](wl::wm::paint) -> LRESULT {
+    PAINTSTRUCT paint{};
+    HDC dc = BeginPaint(hwnd(), &paint);
+    draw(dc);
+    EndPaint(hwnd(), &paint);
+    return 0;
+  });
+
+  on_message(WM_DRAWITEM, [](wl::params params) -> LRESULT {
+    draw_modern_button(*reinterpret_cast<DRAWITEMSTRUCT*>(params.lParam));
+    return TRUE;
   });
 
   on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
@@ -39,16 +53,39 @@ UninstallWindow::UninstallWindow(RuntimeContext& runtime) : runtime_(runtime) {
 }
 
 void UninstallWindow::create_controls() {
+  const auto s = [this](int value) { return theme_.scale(value); };
+
+  title_label_.create(this, -1, L"🗑  Uninstall cleanup", {s(24), s(18)}, {s(420), s(34)});
+  apply_font(title_label_.hwnd(), theme_.title_font());
   summary_label_.create(
     this,
     -1,
     L"Choose which current-user integrations binify should remove before uninstalling. Source executables are never deleted.",
-    {20, 24},
-    {500, 50});
-  path_checkbox_.create(this, kIdPath, L"Remove Bin directory from current-user PATH", {40, 90}, {420, 24});
-  context_menu_checkbox_.create(this, kIdContextMenu, L"Remove Explorer context menu registration", {40, 124}, {420, 24});
-  cleanup_button_.create(this, kIdCleanup, L"Clean up", {330, 174}, {90, 28});
-  cancel_button_.create(this, kIdCancel, text::kCancel, {440, 174}, {90, 28});
+    {s(44), s(86)},
+    {s(540), s(54)});
+  apply_font(summary_label_.hwnd(), theme_.body_font());
+  path_checkbox_.create(this, kIdPath, L"Remove Bin directory from current-user PATH", {s(44), s(184)}, {s(500), s(26)});
+  apply_font(path_checkbox_.hwnd(), theme_.body_font());
+  context_menu_checkbox_.create(this, kIdContextMenu, L"Remove Explorer context menu registration", {s(44), s(222)}, {s(500), s(26)});
+  apply_font(context_menu_checkbox_.hwnd(), theme_.body_font());
+  cleanup_button_.create(this, kIdCleanup, L"🗑  Clean up", {s(410), s(302)}, {s(110), s(36)});
+  apply_font(cleanup_button_.hwnd(), theme_.body_font());
+  make_modern_button(cleanup_button_.hwnd(), ButtonRole::danger);
+  cancel_button_.create(this, kIdCancel, text::kCancel, {s(534), s(302)}, {s(82), s(36)});
+  apply_font(cancel_button_.hwnd(), theme_.body_font());
+  make_modern_button(cancel_button_.hwnd(), ButtonRole::secondary);
+}
+
+void UninstallWindow::draw(HDC dc) const {
+  const auto s = [this](int value) { return theme_.scale(value); };
+  draw_window_background(hwnd(), dc, RGB(0xF6, 0xF8, 0xFB));
+  draw_panel(dc, {s(24), s(72), s(616), s(152)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
+  draw_panel(dc, {s(24), s(172), s(616), s(266)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
+
+  RECT action_bar{s(0), s(284), s(640), s(380)};
+  HBRUSH brush = CreateSolidBrush(RGB(0xF0, 0xF3, 0xF8));
+  FillRect(dc, &action_bar, brush);
+  DeleteObject(brush);
 }
 
 void UninstallWindow::load_config() {

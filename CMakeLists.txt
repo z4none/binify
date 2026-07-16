@@ -60,6 +60,7 @@ add_library(binify_ui STATIC
   src/ui/settings_dialog.cpp
   src/ui/ui_application.cpp
   src/ui/ui_runtime.cpp
+  src/ui/ui_theme.cpp
   src/ui/uninstall_dialog.cpp)
 add_library(binify::ui ALIAS binify_ui)
 target_include_directories(binify_ui PUBLIC src)
