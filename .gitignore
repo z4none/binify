@@ -15,4 +15,4 @@ out/
 *.lib
 *.exp
 Testing/
-
+third_party/innosetup/
