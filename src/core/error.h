@@ -23,6 +23,8 @@ enum class ErrorCode {
   source_invalid,
   link_creation_failed,
   link_mode_unavailable,
+  entry_transaction_failed,
+  entry_transaction_rollback_failed,
   platform_error
 };
 

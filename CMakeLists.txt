@@ -26,7 +26,8 @@ binify_apply_project_options(binify_core)
 
 add_library(binify_app STATIC
   src/app/add_command_creation.cpp
-  src/app/application.cpp)
+  src/app/application.cpp
+  src/app/entry_transaction.cpp)
 add_library(binify::app ALIAS binify_app)
 target_include_directories(binify_app PUBLIC src)
 target_link_libraries(binify_app PUBLIC binify::core)
@@ -58,6 +59,7 @@ add_executable(binify_unit_tests
   tests/unit/config_serialization_tests.cpp
   tests/unit/config_model_tests.cpp
   tests/unit/creation_policy_tests.cpp
+  tests/unit/entry_transaction_tests.cpp
   tests/unit/error_tests.cpp
   tests/unit/path_utils_tests.cpp
   tests/unit/result_tests.cpp
