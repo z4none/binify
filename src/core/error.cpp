@@ -63,6 +63,8 @@ std::wstring_view to_wstring(ErrorCode code) noexcept {
     return L"entry_transaction_failed";
   case ErrorCode::entry_transaction_rollback_failed:
     return L"entry_transaction_rollback_failed";
+  case ErrorCode::operation_cancelled:
+    return L"operation_cancelled";
   case ErrorCode::platform_error:
     return L"platform_error";
   }

@@ -27,6 +27,7 @@ enum class ErrorCode {
   link_mode_unavailable,
   entry_transaction_failed,
   entry_transaction_rollback_failed,
+  operation_cancelled,
   platform_error
 };
 

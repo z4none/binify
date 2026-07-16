@@ -28,8 +28,11 @@ binify_apply_project_options(binify_core)
 
 add_library(binify_app STATIC
   src/app/add_command_creation.cpp
+  src/app/add_command_workflow.cpp
   src/app/application.cpp
-  src/app/entry_transaction.cpp)
+  src/app/entry_transaction.cpp
+  src/app/settings_workflow.cpp
+  src/app/uninstall_workflow.cpp)
 add_library(binify::app ALIAS binify_app)
 target_include_directories(binify_app PUBLIC src)
 target_link_libraries(binify_app PUBLIC binify::core)
@@ -58,6 +61,7 @@ enable_testing()
 
 add_executable(binify_unit_tests
   tests/unit/add_command_creation_tests.cpp
+  tests/unit/add_command_workflow_tests.cpp
   tests/unit/bat_wrapper_tests.cpp
   tests/unit/command_conflict_tests.cpp
   tests/unit/command_name_tests.cpp
@@ -70,8 +74,10 @@ add_executable(binify_unit_tests
   tests/unit/path_utils_tests.cpp
   tests/unit/path_value_tests.cpp
   tests/unit/result_tests.cpp
+  tests/unit/settings_workflow_tests.cpp
   tests/unit/smoke_tests.cpp
-  tests/unit/text_encoding_tests.cpp)
+  tests/unit/text_encoding_tests.cpp
+  tests/unit/uninstall_workflow_tests.cpp)
 target_link_libraries(binify_unit_tests PRIVATE binify::app GTest::gtest_main)
 binify_apply_project_options(binify_unit_tests)
 include(GoogleTest)
