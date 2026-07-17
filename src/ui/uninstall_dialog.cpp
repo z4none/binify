@@ -37,19 +37,16 @@ UninstallWindow::UninstallWindow(RuntimeContext& runtime) : runtime_(runtime) {
     return reinterpret_cast<LRESULT>(transparent_control_background(reinterpret_cast<HDC>(params.wParam)));
   });
 
-  on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
-    switch (command.control_id()) {
-    case kIdCleanup:
-      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Uninstall cleanup button clicked."));
-      run_cleanup();
-      return 0;
-    case kIdCancel:
-      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Uninstall cancel clicked."));
-      DestroyWindow(hwnd());
-      return 0;
-    default:
-      return 0;
-    }
+  on_command(kIdCleanup, [this](wl::params) -> LRESULT {
+    static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Uninstall cleanup button clicked."));
+    run_cleanup();
+    return 0;
+  });
+
+  on_command(kIdCancel, [this](wl::params) -> LRESULT {
+    static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Uninstall cancel clicked."));
+    DestroyWindow(hwnd());
+    return 0;
   });
 }
 

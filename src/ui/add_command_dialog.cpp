@@ -56,23 +56,21 @@ AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::pat
     return reinterpret_cast<LRESULT>(transparent_control_background(reinterpret_cast<HDC>(params.wParam)));
   });
 
-  on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
-    switch (command.control_id()) {
-    case kIdName:
-    case kIdMode:
-      update_entry_preview();
-      return 0;
-    case kIdCreate:
-      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Add command Create clicked."));
-      create_command();
-      return 0;
-    case kIdCancel:
-      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Add command Cancel clicked."));
-      DestroyWindow(hwnd());
-      return 0;
-    default:
-      return 0;
-    }
+  on_command({kIdName, kIdMode}, [this](wl::params) -> LRESULT {
+    update_entry_preview();
+    return 0;
+  });
+
+  on_command(kIdCreate, [this](wl::params) -> LRESULT {
+    static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Add command Create clicked."));
+    create_command();
+    return 0;
+  });
+
+  on_command(kIdCancel, [this](wl::params) -> LRESULT {
+    static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Add command Cancel clicked."));
+    DestroyWindow(hwnd());
+    return 0;
   });
 }
 

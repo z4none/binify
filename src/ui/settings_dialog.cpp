@@ -68,31 +68,34 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime) : runtime_(runtime) {
     return reinterpret_cast<LRESULT>(transparent_control_background(reinterpret_cast<HDC>(params.wParam)));
   });
 
-  on_message(WM_COMMAND, [this](wl::wm::command command) -> LRESULT {
-    switch (command.control_id()) {
-    case kIdBrowse:
-      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Browse clicked."));
-      browse_bin_directory();
-      return 0;
-    case kIdOpenBin:
-      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Open Bin clicked."));
-      open_bin_directory();
-      return 0;
-    case kIdSave:
-      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Save clicked."));
-      save_config();
-      return 0;
-    case kIdCancel:
-      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Cancel clicked."));
-      DestroyWindow(hwnd());
-      return 0;
-    case kIdHello:
-      static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Hello clicked."));
-      MessageBoxW(hwnd(), L"hello", text::kAppTitle, MB_OK | MB_ICONINFORMATION);
-      return 0;
-    default:
-      return 0;
-    }
+  on_command(kIdBrowse, [this](wl::params) -> LRESULT {
+    static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Browse clicked."));
+    browse_bin_directory();
+    return 0;
+  });
+
+  on_command(kIdOpenBin, [this](wl::params) -> LRESULT {
+    static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Open Bin clicked."));
+    open_bin_directory();
+    return 0;
+  });
+
+  on_command(kIdSave, [this](wl::params) -> LRESULT {
+    static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Save clicked."));
+    save_config();
+    return 0;
+  });
+
+  on_command(kIdCancel, [this](wl::params) -> LRESULT {
+    static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Cancel clicked."));
+    DestroyWindow(hwnd());
+    return 0;
+  });
+
+  on_command(kIdHello, [this](wl::params) -> LRESULT {
+    static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Hello clicked."));
+    MessageBoxW(hwnd(), L"hello", text::kAppTitle, MB_OK | MB_ICONINFORMATION);
+    return 0;
   });
 }
 
