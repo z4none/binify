@@ -16,7 +16,7 @@ std::wstring unique_test_key() {
   return L"Software\\binify-tests\\context-menu-" + std::to_wstring(ticks) + L"\\shell\\binify";
 }
 
-std::wstring read_default_value(const std::wstring& key_path) {
+std::wstring read_string_value(const std::wstring& key_path, const wchar_t* value_name) {
   HKEY key = nullptr;
   const auto status = RegOpenKeyExW(HKEY_CURRENT_USER, key_path.c_str(), 0, KEY_QUERY_VALUE, &key);
   if (status != ERROR_SUCCESS) {
@@ -25,14 +25,18 @@ std::wstring read_default_value(const std::wstring& key_path) {
 
   DWORD type = 0;
   DWORD bytes = 0;
-  RegQueryValueExW(key, nullptr, nullptr, &type, nullptr, &bytes);
+  RegQueryValueExW(key, value_name, nullptr, &type, nullptr, &bytes);
   std::wstring value(bytes / sizeof(wchar_t), L'\0');
-  RegQueryValueExW(key, nullptr, nullptr, &type, reinterpret_cast<LPBYTE>(value.data()), &bytes);
+  RegQueryValueExW(key, value_name, nullptr, &type, reinterpret_cast<LPBYTE>(value.data()), &bytes);
   RegCloseKey(key);
   while (!value.empty() && value.back() == L'\0') {
     value.pop_back();
   }
   return value;
+}
+
+std::wstring read_default_value(const std::wstring& key_path) {
+  return read_string_value(key_path, nullptr);
 }
 
 bool key_exists(const std::wstring& key_path) {
@@ -54,6 +58,7 @@ TEST(ContextMenuServiceTests, InstallsAndUninstallsContextMenuUnderCustomKey) {
 
   ASSERT_TRUE(installed);
   EXPECT_EQ(read_default_value(key_path), L"加入 Binify...");
+  EXPECT_EQ(read_string_value(key_path, L"Icon"), L"C:\\Program Files\\binify\\binify.exe");
   EXPECT_EQ(read_default_value(command_key_path), L"\"C:\\Program Files\\binify\\binify.exe\" --add \"%1\"");
 
   const auto uninstalled = service.uninstall();
@@ -71,4 +76,3 @@ TEST(ContextMenuServiceTests, UninstallIsIdempotent) {
 }
 
 } // namespace
-

@@ -67,9 +67,13 @@ core::Result<void> RegistryContextMenuService::install(const std::filesystem::pa
   }
 
   auto written_menu = set_string_value(shell_key, nullptr, kMenuText);
+  auto written_icon = written_menu ? set_string_value(shell_key, L"Icon", executable_path.wstring()) : written_menu;
   RegCloseKey(shell_key);
   if (!written_menu) {
     return written_menu;
+  }
+  if (!written_icon) {
+    return written_icon;
   }
 
   const auto command_key_path = shell_key_path_ + L"\\command";
@@ -102,4 +106,3 @@ core::Result<void> RegistryContextMenuService::uninstall() const {
 }
 
 } // namespace binify::platform::windows
-
