@@ -190,66 +190,56 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime, bool close_after_success
 }
 
 void SettingsWindow::create_controls() {
-  const auto s = [this](int value) { return theme_.scale(value); };
+  const auto s = [](int value) { return value; };
 
   title_label_.create(this, -1, runtime_.text("settings.heading").c_str(), {s(24), s(18)}, {s(420), s(34)});
   apply_font(title_label_.hwnd(), theme_.title_font());
   make_transparent_control(title_label_.hwnd());
 
-  bin_label_.create(this, -1, runtime_.text("settings.bin_directory").c_str(), {s(44), s(118)}, {s(150), s(22)});
+  bin_label_.create(this, -1, runtime_.text("settings.bin_directory").c_str(), {s(56), s(128)}, {s(150), s(22)});
   apply_font(bin_label_.hwnd(), theme_.body_font());
   make_transparent_control(bin_label_.hwnd());
-  bin_text_.create(this, kIdBinText, wl::textbox::type::NORMAL, {s(44), s(146)}, s(280), s(25));
+  bin_text_.create(this, kIdBinText, wl::textbox::type::NORMAL, {s(56), s(156)}, s(344), s(25));
   apply_font(bin_text_.hwnd(), theme_.body_font());
   const auto browse_text = L"📁  " + runtime_.text("common.browse");
-  browse_button_.create(this, kIdBrowse, browse_text.c_str(), {s(350), s(144)}, {s(104), s(32)});
+  browse_button_.create(this, kIdBrowse, browse_text.c_str(), {s(436), s(152)}, {s(128), s(36)});
   apply_font(browse_button_.hwnd(), theme_.body_font());
   make_modern_button(browse_button_.hwnd(), ButtonRole::secondary);
   const auto open_bin_text = L"📂  " + runtime_.text("common.open_bin");
-  open_bin_button_.create(this, kIdOpenBin, open_bin_text.c_str(), {s(470), s(144)}, {s(104), s(32)});
+  open_bin_button_.create(this, kIdOpenBin, open_bin_text.c_str(), {s(584), s(152)}, {s(128), s(36)});
   apply_font(open_bin_button_.hwnd(), theme_.body_font());
   make_modern_button(open_bin_button_.hwnd(), ButtonRole::secondary);
 
-  path_checkbox_.create(this, kIdPath, runtime_.text("settings.path_toggle").c_str(), {s(44), s(228)}, {s(640), s(26)});
+  path_checkbox_.create(this, kIdPath, runtime_.text("settings.path_toggle").c_str(), {s(56), s(224)}, {s(680), s(26)});
   apply_font(path_checkbox_.hwnd(), theme_.body_font());
   make_transparent_control(path_checkbox_.hwnd());
-  context_menu_checkbox_.create(this, kIdContextMenu, runtime_.text("settings.context_menu_toggle").c_str(), {s(44), s(268)}, {s(640), s(26)});
+  context_menu_checkbox_.create(this, kIdContextMenu, runtime_.text("settings.context_menu_toggle").c_str(), {s(56), s(264)}, {s(680), s(26)});
   apply_font(context_menu_checkbox_.hwnd(), theme_.body_font());
   make_transparent_control(context_menu_checkbox_.hwnd());
 
-  language_label_.create(this, -1, runtime_.text("settings.language").c_str(), {s(44), s(312)}, {s(140), s(22)});
+  language_label_.create(this, -1, runtime_.text("settings.language").c_str(), {s(56), s(320)}, {s(140), s(22)});
   apply_font(language_label_.hwnd(), theme_.body_font());
   make_transparent_control(language_label_.hwnd());
-  language_combo_.create(this, kIdLanguage, {s(190), s(308)}, s(260), wl::combobox::sort::UNSORTED);
-  SetWindowPos(language_combo_.hwnd(), nullptr, 0, 0, s(260), s(140), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+  language_combo_.create(this, kIdLanguage, {s(56), s(348)}, s(320), wl::combobox::sort::UNSORTED);
+  SetWindowPos(language_combo_.hwnd(), nullptr, 0, 0, s(320), s(140), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
   apply_font(language_combo_.hwnd(), theme_.body_font());
   populate_languages();
 
-  help_label_.create(this, -1, runtime_.text("settings.help").c_str(), {s(44), s(398)}, {s(680), s(28)});
+  help_label_.create(this, -1, runtime_.text("settings.help").c_str(), {s(56), s(408)}, {s(720), s(28)});
   apply_font(help_label_.hwnd(), theme_.small_font());
   make_transparent_control(help_label_.hwnd());
 
   const auto save_text = L"✓  " + runtime_.text("common.save");
-  save_button_.create(this, kIdSave, save_text.c_str(), {s(650), s(542)}, {s(90), s(36)});
+  save_button_.create(this, kIdSave, save_text.c_str(), {s(642), s(502)}, {s(90), s(36)});
   apply_font(save_button_.hwnd(), theme_.body_font());
   make_modern_button(save_button_.hwnd(), ButtonRole::primary);
-  cancel_button_.create(this, kIdCancel, runtime_.text("common.cancel").c_str(), {s(752), s(542)}, {s(82), s(36)});
+  cancel_button_.create(this, kIdCancel, runtime_.text("common.cancel").c_str(), {s(746), s(502)}, {s(82), s(36)});
   apply_font(cancel_button_.hwnd(), theme_.body_font());
   make_modern_button(cancel_button_.hwnd(), ButtonRole::secondary);
 }
 
 void SettingsWindow::draw(HDC dc) const {
-  const auto s = [this](int value) { return theme_.scale(value); };
   draw_window_background(hwnd(), dc, RGB(0xF6, 0xF8, 0xFB));
-  if (active_tab_ == 0) {
-    draw_panel(dc, {s(24), s(102), s(812), s(190)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
-    draw_panel(dc, {s(24), s(208), s(812), s(372)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
-  }
-
-  RECT action_bar{s(0), s(524), s(860), s(620)};
-  HBRUSH brush = CreateSolidBrush(RGB(0xF0, 0xF3, 0xF8));
-  FillRect(dc, &action_bar, brush);
-  DeleteObject(brush);
 }
 
 void SettingsWindow::load_config() {
@@ -321,16 +311,16 @@ void SettingsWindow::open_bin_directory() const {
 }
 
 void SettingsWindow::create_tab_control() {
-  const auto s = [this](int value) { return theme_.scale(value); };
+  const auto s = [](int value) { return value; };
   tab_control_ = CreateWindowExW(
     0,
     WC_TABCONTROLW,
     nullptr,
     WS_CHILD | WS_VISIBLE | WS_TABSTOP,
     s(24),
-    s(62),
+    s(76),
     s(812),
-    s(452),
+    s(500),
     hwnd(),
     reinterpret_cast<HMENU>(static_cast<UINT_PTR>(kIdTab)),
     reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(hwnd(), GWLP_HINSTANCE)),
@@ -348,16 +338,16 @@ void SettingsWindow::create_tab_control() {
 }
 
 void SettingsWindow::create_entries_controls() {
-  const auto s = [this](int value) { return theme_.scale(value); };
+  const auto s = [](int value) { return value; };
   entries_list_ = CreateWindowExW(
     WS_EX_CLIENTEDGE,
     WC_LISTVIEWW,
     nullptr,
     WS_CHILD | WS_TABSTOP | LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS,
-    s(44),
-    s(112),
-    s(760),
-    s(226),
+    s(56),
+    s(128),
+    s(748),
+    s(260),
     hwnd(),
     reinterpret_cast<HMENU>(static_cast<UINT_PTR>(kIdEntriesList)),
     reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(hwnd(), GWLP_HINSTANCE)),
@@ -381,32 +371,32 @@ void SettingsWindow::create_entries_controls() {
   }
 
   const auto refresh_text = runtime_.text("entries.refresh");
-  refresh_entries_button_.create(this, kIdRefreshEntries, refresh_text.c_str(), {s(44), s(358)}, {s(90), s(32)});
+  refresh_entries_button_.create(this, kIdRefreshEntries, refresh_text.c_str(), {s(56), s(412)}, {s(90), s(32)});
   apply_font(refresh_entries_button_.hwnd(), theme_.body_font());
   make_modern_button(refresh_entries_button_.hwnd(), ButtonRole::secondary);
 
   const auto add_text = runtime_.text("entries.add");
-  add_entry_button_.create(this, kIdAddEntry, add_text.c_str(), {s(148), s(358)}, {s(90), s(32)});
+  add_entry_button_.create(this, kIdAddEntry, add_text.c_str(), {s(160), s(412)}, {s(90), s(32)});
   apply_font(add_entry_button_.hwnd(), theme_.body_font());
   make_modern_button(add_entry_button_.hwnd(), ButtonRole::secondary);
 
   const auto delete_text = runtime_.text("entries.delete");
-  delete_entry_button_.create(this, kIdDeleteEntry, delete_text.c_str(), {s(252), s(358)}, {s(90), s(32)});
+  delete_entry_button_.create(this, kIdDeleteEntry, delete_text.c_str(), {s(264), s(412)}, {s(90), s(32)});
   apply_font(delete_entry_button_.hwnd(), theme_.body_font());
   make_modern_button(delete_entry_button_.hwnd(), ButtonRole::danger);
 
   const auto open_text = runtime_.text("common.open_bin");
-  open_bin_entries_button_.create(this, kIdOpenBinEntries, open_text.c_str(), {s(356), s(358)}, {s(104), s(32)});
+  open_bin_entries_button_.create(this, kIdOpenBinEntries, open_text.c_str(), {s(368), s(412)}, {s(104), s(32)});
   apply_font(open_bin_entries_button_.hwnd(), theme_.body_font());
   make_modern_button(open_bin_entries_button_.hwnd(), ButtonRole::secondary);
 
-  rename_label_.create(this, -1, runtime_.text("entries.new_name").c_str(), {s(44), s(408)}, {s(120), s(22)});
+  rename_label_.create(this, -1, runtime_.text("entries.new_name").c_str(), {s(56), s(468)}, {s(120), s(22)});
   apply_font(rename_label_.hwnd(), theme_.body_font());
   make_transparent_control(rename_label_.hwnd());
-  rename_text_.create(this, kIdRenameText, wl::textbox::type::NORMAL, {s(164), s(404)}, s(220), s(25));
+  rename_text_.create(this, kIdRenameText, wl::textbox::type::NORMAL, {s(176), s(464)}, s(220), s(25));
   apply_font(rename_text_.hwnd(), theme_.body_font());
   const auto rename_text = runtime_.text("entries.rename");
-  rename_entry_button_.create(this, kIdRenameEntry, rename_text.c_str(), {s(398), s(400)}, {s(90), s(32)});
+  rename_entry_button_.create(this, kIdRenameEntry, rename_text.c_str(), {s(410), s(460)}, {s(90), s(32)});
   apply_font(rename_entry_button_.hwnd(), theme_.body_font());
   make_modern_button(rename_entry_button_.hwnd(), ButtonRole::secondary);
 }
