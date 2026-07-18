@@ -42,7 +42,7 @@ void set_visible(HWND control, bool visible) {
 
 void move_window(HWND control, int x, int y, int width, int height) {
   if (control != nullptr) {
-    SetWindowPos(control, nullptr, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE);
+    SetWindowPos(control, nullptr, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
   }
 }
 
@@ -315,7 +315,9 @@ void SettingsWindow::layout_controls() {
   move_window(cancel_button_.hwnd(), right - 82, bottom - button_height, 82, button_height);
 
   const int list_top = page_top;
-  const int list_height = std::max(150, height - 236);
+  const int entries_button_top = bottom - 104;
+  const int rename_top = bottom - 48;
+  const int list_height = std::max(120, entries_button_top - list_top - 24);
   move_window(entries_list_, margin, list_top, width - margin * 2, list_height);
   if (entries_list_ != nullptr) {
     const int list_width = width - margin * 2 - 4;
@@ -326,14 +328,13 @@ void SettingsWindow::layout_controls() {
     ListView_SetColumnWidth(entries_list_, 4, 260);
   }
 
-  const int entries_button_top = list_top + list_height + 24;
   move_window(refresh_entries_button_.hwnd(), margin, entries_button_top, small_button_width, small_button_height);
   move_window(add_entry_button_.hwnd(), margin + 104, entries_button_top, small_button_width, small_button_height);
   move_window(delete_entry_button_.hwnd(), margin + 208, entries_button_top, small_button_width, small_button_height);
   move_window(open_bin_entries_button_.hwnd(), margin + 312, entries_button_top, 104, small_button_height);
-  move_window(rename_label_.hwnd(), margin, entries_button_top + 56, 120, 22);
-  move_window(rename_text_.hwnd(), margin + 120, entries_button_top + 52, 220, 25);
-  move_window(rename_entry_button_.hwnd(), margin + 354, entries_button_top + 48, small_button_width, small_button_height);
+  move_window(rename_label_.hwnd(), margin, rename_top + 4, 120, 22);
+  move_window(rename_text_.hwnd(), margin + 120, rename_top, 220, 25);
+  move_window(rename_entry_button_.hwnd(), margin + 354, rename_top - 4, small_button_width, small_button_height);
 
   const std::vector<HWND> config_controls{
     bin_label_.hwnd(), bin_text_.hwnd(), browse_button_.hwnd(), open_bin_button_.hwnd(),
@@ -348,6 +349,7 @@ void SettingsWindow::layout_controls() {
   for (const auto control : active_tab_ == 0 ? config_controls : entry_controls) {
     SetWindowPos(control, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
   }
+  RedrawWindow(hwnd(), nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
 }
 
 void SettingsWindow::draw(HDC dc) const {
