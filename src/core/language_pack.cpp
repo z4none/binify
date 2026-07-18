@@ -49,7 +49,6 @@ LanguagePack make_built_in_english() {
     {"entries.select_first", L"Select an entry first."},
     {"entries.bin_not_configured", L"Configure a Bin directory on the Config tab first."},
     {"entries.delete_confirm", L"Delete the selected Bin entry file? The source program will not be deleted."},
-    {"entries.deleted", L"Entry deleted."},
     {"entries.renamed", L"Entry renamed."},
     {"entries.choose_source", L"Choose source executable"},
     {"entries.unknown", L"Unknown"},

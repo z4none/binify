@@ -38,7 +38,6 @@
     "entries.select_first": "Select an entry first.",
     "entries.bin_not_configured": "Configure a Bin directory on the Config tab first.",
     "entries.delete_confirm": "Delete the selected Bin entry file? The source program will not be deleted.",
-    "entries.deleted": "Entry deleted.",
     "entries.renamed": "Entry renamed.",
     "entries.choose_source": "Choose source executable",
     "entries.unknown": "Unknown",

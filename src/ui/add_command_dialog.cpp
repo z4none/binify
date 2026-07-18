@@ -190,6 +190,7 @@ void AddCommandWindow::create_command() {
 
   static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Command entry created."));
   show_add_success(hwnd(), result.value(), runtime_.translator);
+  DestroyWindow(hwnd());
 }
 
 core::LinkMode AddCommandWindow::selected_link_mode() const {

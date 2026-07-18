@@ -519,7 +519,6 @@ void SettingsWindow::delete_selected_entry() {
     show_error(hwnd(), deleted.error());
     return;
   }
-  show_info(hwnd(), runtime_.text("entries.deleted"));
   refresh_entries();
 }
 

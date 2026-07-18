@@ -38,7 +38,6 @@
     "entries.select_first": "请先选择一个条目。",
     "entries.bin_not_configured": "请先在 Config 页面配置 Bin 目录。",
     "entries.delete_confirm": "确认删除选中的 Bin 条目文件？源程序不会被删除。",
-    "entries.deleted": "条目已删除。",
     "entries.renamed": "条目已重命名。",
     "entries.choose_source": "选择源程序",
     "entries.unknown": "Unknown",
