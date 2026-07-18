@@ -55,6 +55,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: "{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "license.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\THIRD_PARTY_NOTICES.md"; DestDir: "{app}\licenses"; DestName: "THIRD_PARTY_NOTICES.md"; Flags: ignoreversion
 Source: "..\third_party\winlamb\LICENSE.txt"; DestDir: "{app}\licenses"; DestName: "winlamb-LICENSE.txt"; Flags: ignoreversion
 
 [Icons]
