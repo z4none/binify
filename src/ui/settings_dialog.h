@@ -26,7 +26,7 @@ public:
 
 private:
   void create_controls();
-  void layout_controls(int width, int height);
+  void layout_controls();
   void draw(HDC dc) const;
   void load_config();
   void save_config();

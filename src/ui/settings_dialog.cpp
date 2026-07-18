@@ -111,9 +111,7 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime, bool close_after_success
     create_entries_controls();
     load_config();
     show_tab(0);
-    RECT client{};
-    GetClientRect(hwnd(), &client);
-    layout_controls(client.right - client.left, client.bottom - client.top);
+    layout_controls();
     SetTimer(hwnd(), kTabPollTimer, 150, nullptr);
     return 0;
   });
@@ -130,8 +128,26 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime, bool close_after_success
     return reinterpret_cast<LRESULT>(transparent_control_background(reinterpret_cast<HDC>(params.wParam)));
   });
 
-  on_message(WM_SIZE, [this](wl::params params) -> LRESULT {
-    layout_controls(LOWORD(params.lParam), HIWORD(params.lParam));
+  on_message(WM_SIZE, [this](wl::params) -> LRESULT {
+    layout_controls();
+    InvalidateRect(hwnd(), nullptr, TRUE);
+    return 0;
+  });
+
+  on_message(WM_DPICHANGED, [this](wl::params params) -> LRESULT {
+    if (params.lParam != 0) {
+      const auto* suggested = reinterpret_cast<const RECT*>(params.lParam);
+      SetWindowPos(
+        hwnd(),
+        nullptr,
+        suggested->left,
+        suggested->top,
+        suggested->right - suggested->left,
+        suggested->bottom - suggested->top,
+        SWP_NOZORDER | SWP_NOACTIVATE);
+    }
+    theme_.initialize(hwnd());
+    layout_controls();
     InvalidateRect(hwnd(), nullptr, TRUE);
     return 0;
   });
@@ -259,9 +275,15 @@ void SettingsWindow::create_controls() {
   make_modern_button(cancel_button_.hwnd(), ButtonRole::secondary);
 }
 
-void SettingsWindow::layout_controls(int width, int height) {
-  width = MulDiv(width, 96, static_cast<int>(theme_.dpi()));
-  height = MulDiv(height, 96, static_cast<int>(theme_.dpi()));
+void SettingsWindow::layout_controls() {
+  RECT client{};
+  GetClientRect(hwnd(), &client);
+  // WinLamb/control coordinates are authored in 96-DPI logical units. GetClientRect
+  // returns the current DPI-scaled client size, so convert it back before deriving
+  // responsive positions. Without this, controls and the tab page drift off-screen
+  // on high-DPI displays.
+  int width = MulDiv(client.right - client.left, 96, static_cast<int>(theme_.dpi()));
+  int height = MulDiv(client.bottom - client.top, 96, static_cast<int>(theme_.dpi()));
   width = std::max(width, kMinWindowWidth);
   height = std::max(height, kMinWindowHeight);
 
@@ -523,9 +545,7 @@ void SettingsWindow::show_tab(int tab_index) {
   if (entries_visible) {
     refresh_entries();
   }
-  RECT client{};
-  GetClientRect(hwnd(), &client);
-  layout_controls(client.right - client.left, client.bottom - client.top);
+  layout_controls();
   InvalidateRect(hwnd(), nullptr, TRUE);
 }
 
