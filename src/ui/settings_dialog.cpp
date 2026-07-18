@@ -42,7 +42,10 @@ std::filesystem::path choose_folder(HWND owner) {
 
 } // namespace
 
-SettingsWindow::SettingsWindow(RuntimeContext& runtime) : runtime_(runtime) {
+SettingsWindow::SettingsWindow(RuntimeContext& runtime) : SettingsWindow(runtime, false) {}
+
+SettingsWindow::SettingsWindow(RuntimeContext& runtime, bool close_after_success)
+  : runtime_(runtime), close_after_success_(close_after_success) {
   setup.wndClassEx.lpszClassName = L"BINIFY_SETTINGS_WINDOW";
   setup.title = text::kSettingsTitle;
   setup.size = scale_size_for_system_dpi(760, 540);
@@ -178,6 +181,9 @@ void SettingsWindow::save_config() {
 
   static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings saved."));
   show_info(hwnd(), L"Settings saved successfully.");
+  if (close_after_success_) {
+    DestroyWindow(hwnd());
+  }
 }
 
 void SettingsWindow::browse_bin_directory() {

@@ -4,7 +4,6 @@
 
 #include "ui/conflict_dialog.h"
 #include "ui/result_dialog.h"
-#include "ui/settings_dialog.h"
 #include "ui/ui_text.h"
 
 namespace binify::ui {

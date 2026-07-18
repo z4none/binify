@@ -17,6 +17,7 @@ namespace binify::ui {
 class SettingsWindow final : public wl::window_main {
 public:
   explicit SettingsWindow(RuntimeContext& runtime);
+  SettingsWindow(RuntimeContext& runtime, bool close_after_success);
 
 private:
   void create_controls();
@@ -27,6 +28,7 @@ private:
   void open_bin_directory() const;
 
   RuntimeContext& runtime_;
+  bool close_after_success_ = false;
   Theme theme_;
   wl::label title_label_;
   wl::label bin_label_;

@@ -1,7 +1,9 @@
 #include "ui/ui_application.h"
 
 #include <exception>
+#include <filesystem>
 
+#include "core/config.h"
 #include "ui/add_command_dialog.h"
 #include "ui/settings_dialog.h"
 #include "ui/ui_runtime.h"
@@ -18,6 +20,38 @@ namespace {
 [[nodiscard]] int show_exception(const wchar_t* message) noexcept {
   MessageBoxW(nullptr, message, text::kAppTitle, MB_ICONERROR | MB_OK);
   return 1;
+}
+
+[[nodiscard]] bool has_configured_bin(RuntimeContext& runtime) {
+  const auto loaded = runtime.config_store.load();
+  if (!loaded) {
+    show_error(nullptr, loaded.error());
+    return false;
+  }
+  return loaded.value().has_value() && core::is_configured(*loaded.value());
+}
+
+[[nodiscard]] int run_add_flow(
+  HINSTANCE instance,
+  int command_show,
+  RuntimeContext& runtime,
+  std::filesystem::path source_path) {
+  if (!has_configured_bin(runtime)) {
+    MessageBoxW(
+      nullptr,
+      L"Bin directory is not configured. Configure settings first; after saving, binify will continue adding the selected executable.",
+      text::kAppTitle,
+      MB_ICONINFORMATION | MB_OK);
+
+    SettingsWindow settings{runtime, true};
+    const int settings_result = settings.winmain_run(instance, command_show);
+    if (settings_result != 0 || !has_configured_bin(runtime)) {
+      return settings_result;
+    }
+  }
+
+  AddCommandWindow window{runtime, std::move(source_path)};
+  return window.winmain_run(instance, command_show);
 }
 
 } // namespace
@@ -39,8 +73,7 @@ int run_ui(HINSTANCE instance, int command_show, const std::vector<std::wstring>
     static_cast<void>(runtime.logger.write(app::LogLevel::info, L"binify UI started."));
 
     if (arguments.size() >= 3 && is_option(arguments[1], L"--add")) {
-      AddCommandWindow window{runtime, arguments[2]};
-      return window.winmain_run(instance, command_show);
+      return run_add_flow(instance, command_show, runtime, arguments[2]);
     }
 
     if (arguments.size() >= 2 && is_option(arguments[1], L"--uninstall-cleanup")) {
