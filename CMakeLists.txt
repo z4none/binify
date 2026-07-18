@@ -31,6 +31,7 @@ add_library(binify_app STATIC
   src/app/add_command_creation.cpp
   src/app/add_command_workflow.cpp
   src/app/application.cpp
+  src/app/bin_entries.cpp
   src/app/entry_transaction.cpp
   src/app/settings_workflow.cpp
   src/app/uninstall_workflow.cpp)
@@ -67,7 +68,7 @@ add_library(binify::ui ALIAS binify_ui)
 target_include_directories(binify_ui PUBLIC src)
 target_include_directories(binify_ui PRIVATE resources)
 target_link_libraries(binify_ui PUBLIC binify::windows winlamb)
-target_link_libraries(binify_ui PRIVATE shell32 ole32 user32)
+target_link_libraries(binify_ui PRIVATE comctl32 comdlg32 shell32 ole32 user32)
 binify_apply_project_options(binify_ui)
 
 add_executable(binify WIN32
@@ -86,6 +87,7 @@ add_executable(binify_unit_tests
   tests/unit/add_command_creation_tests.cpp
   tests/unit/add_command_workflow_tests.cpp
   tests/unit/bat_wrapper_tests.cpp
+  tests/unit/bin_entries_tests.cpp
   tests/unit/command_conflict_tests.cpp
   tests/unit/command_name_tests.cpp
   tests/unit/config_serialization_tests.cpp

@@ -7,6 +7,7 @@
 #include <windows.h>
 
 #include "app/add_command_workflow.h"
+#include "app/bin_entries.h"
 #include "app/settings_workflow.h"
 #include "app/uninstall_workflow.h"
 #include "core/language_pack.h"
@@ -49,6 +50,7 @@ public:
   platform::windows::WindowsShellService shell_service;
   platform::windows::FileLogger logger;
   WindowsDirectoryListing directory_listing;
+  app::StdBinEntryFileSystem bin_entry_file_system;
   app::SettingsWorkflow settings_workflow;
   app::AddCommandWorkflow add_command_workflow;
   app::UninstallWorkflow uninstall_workflow;
