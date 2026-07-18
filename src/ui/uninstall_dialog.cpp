@@ -14,6 +14,8 @@ constexpr int kIdCancel = 3004;
 
 UninstallWindow::UninstallWindow(RuntimeContext& runtime) : runtime_(runtime) {
   setup.wndClassEx.lpszClassName = L"BINIFY_UNINSTALL_WINDOW";
+  setup.wndClassEx.hIcon = app_icon(32);
+  setup.wndClassEx.hIconSm = app_icon(16);
   setup.title = text::kUninstallTitle;
   setup.size = scale_size_for_system_dpi(640, 380);
   setup.style |= WS_MINIMIZEBOX;

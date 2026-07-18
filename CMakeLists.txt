@@ -64,6 +64,7 @@ add_library(binify_ui STATIC
   src/ui/uninstall_dialog.cpp)
 add_library(binify::ui ALIAS binify_ui)
 target_include_directories(binify_ui PUBLIC src)
+target_include_directories(binify_ui PRIVATE resources)
 target_link_libraries(binify_ui PUBLIC binify::windows winlamb)
 target_link_libraries(binify_ui PRIVATE shell32 ole32 user32)
 binify_apply_project_options(binify_ui)

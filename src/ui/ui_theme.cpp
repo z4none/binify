@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <iterator>
 
+#include "resource.h"
+
 namespace binify::ui {
 namespace {
 
@@ -156,6 +158,12 @@ void enable_process_dpi_awareness() noexcept {
   }
 
   SetProcessDPIAware();
+}
+
+HICON app_icon(int size) noexcept {
+  const HINSTANCE instance = GetModuleHandleW(nullptr);
+  return static_cast<HICON>(
+    LoadImageW(instance, MAKEINTRESOURCEW(IDI_BINIFY), IMAGE_ICON, size, size, LR_DEFAULTCOLOR | LR_SHARED));
 }
 
 void apply_font(HWND control, HFONT font) noexcept {

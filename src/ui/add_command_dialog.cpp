@@ -31,6 +31,8 @@ std::wstring default_command_name(const std::filesystem::path& source_path) {
 AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::path source_path)
   : runtime_(runtime), source_path_(std::move(source_path)) {
   setup.wndClassEx.lpszClassName = L"BINIFY_ADD_COMMAND_WINDOW";
+  setup.wndClassEx.hIcon = app_icon(32);
+  setup.wndClassEx.hIconSm = app_icon(16);
   setup.title = text::kAddCommandTitle;
   setup.size = scale_size_for_system_dpi(780, 560);
   setup.style |= WS_MINIMIZEBOX;

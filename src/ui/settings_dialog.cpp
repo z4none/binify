@@ -47,6 +47,8 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime) : SettingsWindow(runtime
 SettingsWindow::SettingsWindow(RuntimeContext& runtime, bool close_after_success)
   : runtime_(runtime), close_after_success_(close_after_success) {
   setup.wndClassEx.lpszClassName = L"BINIFY_SETTINGS_WINDOW";
+  setup.wndClassEx.hIcon = app_icon(32);
+  setup.wndClassEx.hIconSm = app_icon(16);
   setup.title = text::kSettingsTitle;
   setup.size = scale_size_for_system_dpi(760, 540);
   setup.style |= WS_MINIMIZEBOX;

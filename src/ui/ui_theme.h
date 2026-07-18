@@ -36,6 +36,7 @@ private:
 };
 
 void enable_process_dpi_awareness() noexcept;
+[[nodiscard]] HICON app_icon(int size) noexcept;
 [[nodiscard]] int scale_for_system_dpi(int value) noexcept;
 [[nodiscard]] SIZE scale_size_for_system_dpi(int width, int height) noexcept;
 void apply_font(HWND control, HFONT font) noexcept;

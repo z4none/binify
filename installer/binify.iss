@@ -36,6 +36,7 @@ DefaultDirName={localappdata}\Programs\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 LicenseFile=license.txt
+SetupIconFile=..\resources\icons\binify.ico
 OutputDir=..\out\installer
 OutputBaseFilename={#AppName}-{#AppVersion}-windows-{#AppArch}
 Compression=lzma2
