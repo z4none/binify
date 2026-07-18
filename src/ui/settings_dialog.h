@@ -26,6 +26,7 @@ public:
 
 private:
   void create_controls();
+  void layout_controls(int width, int height);
   void draw(HDC dc) const;
   void load_config();
   void save_config();
@@ -48,7 +49,6 @@ private:
   RuntimeContext& runtime_;
   bool close_after_success_ = false;
   Theme theme_;
-  wl::label title_label_;
   wl::label bin_label_;
   wl::textbox bin_text_;
   wl::button browse_button_;

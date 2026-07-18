@@ -1,6 +1,7 @@
 #include "ui/settings_dialog.h"
 
 #include <commdlg.h>
+#include <algorithm>
 #include <chrono>
 #include <ctime>
 #include <shlobj.h>
@@ -30,10 +31,18 @@ constexpr int kIdDeleteEntry = 1105;
 constexpr int kIdOpenBinEntries = 1106;
 constexpr int kIdRenameText = 1107;
 constexpr UINT_PTR kTabPollTimer = 1201;
+constexpr int kMinWindowWidth = 720;
+constexpr int kMinWindowHeight = 520;
 
 void set_visible(HWND control, bool visible) {
   if (control != nullptr) {
     ShowWindow(control, visible ? SW_SHOW : SW_HIDE);
+  }
+}
+
+void move_window(HWND control, int x, int y, int width, int height) {
+  if (control != nullptr) {
+    SetWindowPos(control, nullptr, x, y, width, height, SWP_NOZORDER | SWP_NOACTIVATE);
   }
 }
 
@@ -82,13 +91,13 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime) : SettingsWindow(runtime
 
 SettingsWindow::SettingsWindow(RuntimeContext& runtime, bool close_after_success)
   : runtime_(runtime), close_after_success_(close_after_success) {
-  window_title_ = runtime_.text("settings.title");
+  window_title_ = L"binify";
   setup.wndClassEx.lpszClassName = L"BINIFY_SETTINGS_WINDOW";
   setup.wndClassEx.hIcon = app_icon(32);
   setup.wndClassEx.hIconSm = app_icon(16);
   setup.title = window_title_.c_str();
   setup.size = scale_size_for_system_dpi(860, 620);
-  setup.style |= WS_MINIMIZEBOX;
+  setup.style |= WS_MINIMIZEBOX | WS_SIZEBOX | WS_MAXIMIZEBOX;
 
   on_message(WM_CREATE, [this](wl::wm::create) -> LRESULT {
     INITCOMMONCONTROLSEX controls{
@@ -102,6 +111,9 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime, bool close_after_success
     create_entries_controls();
     load_config();
     show_tab(0);
+    RECT client{};
+    GetClientRect(hwnd(), &client);
+    layout_controls(client.right - client.left, client.bottom - client.top);
     SetTimer(hwnd(), kTabPollTimer, 150, nullptr);
     return 0;
   });
@@ -116,6 +128,19 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime, bool close_after_success
 
   on_message(WM_CTLCOLORSTATIC, [](wl::params params) -> LRESULT {
     return reinterpret_cast<LRESULT>(transparent_control_background(reinterpret_cast<HDC>(params.wParam)));
+  });
+
+  on_message(WM_SIZE, [this](wl::params params) -> LRESULT {
+    layout_controls(LOWORD(params.lParam), HIWORD(params.lParam));
+    InvalidateRect(hwnd(), nullptr, TRUE);
+    return 0;
+  });
+
+  on_message(WM_GETMINMAXINFO, [](wl::params params) -> LRESULT {
+    auto* info = reinterpret_cast<MINMAXINFO*>(params.lParam);
+    info->ptMinTrackSize.x = kMinWindowWidth;
+    info->ptMinTrackSize.y = kMinWindowHeight;
+    return 0;
   });
 
   on_notify(kIdTab, TCN_SELCHANGE, [this](wl::params) -> LRESULT {
@@ -192,10 +217,6 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime, bool close_after_success
 void SettingsWindow::create_controls() {
   const auto s = [](int value) { return value; };
 
-  title_label_.create(this, -1, runtime_.text("settings.heading").c_str(), {s(24), s(18)}, {s(420), s(34)});
-  apply_font(title_label_.hwnd(), theme_.title_font());
-  make_transparent_control(title_label_.hwnd());
-
   bin_label_.create(this, -1, runtime_.text("settings.bin_directory").c_str(), {s(56), s(128)}, {s(150), s(22)});
   apply_font(bin_label_.hwnd(), theme_.body_font());
   make_transparent_control(bin_label_.hwnd());
@@ -236,6 +257,79 @@ void SettingsWindow::create_controls() {
   cancel_button_.create(this, kIdCancel, runtime_.text("common.cancel").c_str(), {s(746), s(502)}, {s(82), s(36)});
   apply_font(cancel_button_.hwnd(), theme_.body_font());
   make_modern_button(cancel_button_.hwnd(), ButtonRole::secondary);
+}
+
+void SettingsWindow::layout_controls(int width, int height) {
+  width = MulDiv(width, 96, static_cast<int>(theme_.dpi()));
+  height = MulDiv(height, 96, static_cast<int>(theme_.dpi()));
+  width = std::max(width, kMinWindowWidth);
+  height = std::max(height, kMinWindowHeight);
+
+  move_window(tab_control_, 0, 0, width, height);
+  if (tab_control_ != nullptr) {
+    SetWindowPos(tab_control_, HWND_BOTTOM, 0, 0, width, height, SWP_NOACTIVATE);
+  }
+
+  const int margin = 32;
+  const int page_top = 48;
+  const int gap = 16;
+  const int button_width = 128;
+  const int button_height = 36;
+  const int small_button_width = 90;
+  const int small_button_height = 32;
+  const int right = width - margin;
+  const int bottom = height - margin;
+
+  const int open_bin_x = right - button_width;
+  const int browse_x = open_bin_x - gap - button_width;
+  const int text_width = std::max(220, browse_x - margin - gap);
+  move_window(bin_label_.hwnd(), margin, page_top, 150, 22);
+  move_window(bin_text_.hwnd(), margin, page_top + 28, text_width, 25);
+  move_window(browse_button_.hwnd(), browse_x, page_top + 24, button_width, button_height);
+  move_window(open_bin_button_.hwnd(), open_bin_x, page_top + 24, button_width, button_height);
+
+  move_window(path_checkbox_.hwnd(), margin, page_top + 96, std::max(300, width - margin * 2), 26);
+  move_window(context_menu_checkbox_.hwnd(), margin, page_top + 136, std::max(300, width - margin * 2), 26);
+  move_window(language_label_.hwnd(), margin, page_top + 192, 140, 22);
+  move_window(language_combo_.hwnd(), margin, page_top + 220, 320, 140);
+  move_window(help_label_.hwnd(), margin, std::min(page_top + 280, bottom - 100), std::max(300, width - margin * 2), 28);
+  move_window(save_button_.hwnd(), right - 194, bottom - button_height, 90, button_height);
+  move_window(cancel_button_.hwnd(), right - 82, bottom - button_height, 82, button_height);
+
+  const int list_top = page_top;
+  const int list_height = std::max(150, height - 236);
+  move_window(entries_list_, margin, list_top, width - margin * 2, list_height);
+  if (entries_list_ != nullptr) {
+    const int list_width = width - margin * 2 - 4;
+    ListView_SetColumnWidth(entries_list_, 0, 130);
+    ListView_SetColumnWidth(entries_list_, 1, 110);
+    ListView_SetColumnWidth(entries_list_, 2, std::max(180, list_width - 610));
+    ListView_SetColumnWidth(entries_list_, 3, 110);
+    ListView_SetColumnWidth(entries_list_, 4, 260);
+  }
+
+  const int entries_button_top = list_top + list_height + 24;
+  move_window(refresh_entries_button_.hwnd(), margin, entries_button_top, small_button_width, small_button_height);
+  move_window(add_entry_button_.hwnd(), margin + 104, entries_button_top, small_button_width, small_button_height);
+  move_window(delete_entry_button_.hwnd(), margin + 208, entries_button_top, small_button_width, small_button_height);
+  move_window(open_bin_entries_button_.hwnd(), margin + 312, entries_button_top, 104, small_button_height);
+  move_window(rename_label_.hwnd(), margin, entries_button_top + 56, 120, 22);
+  move_window(rename_text_.hwnd(), margin + 120, entries_button_top + 52, 220, 25);
+  move_window(rename_entry_button_.hwnd(), margin + 354, entries_button_top + 48, small_button_width, small_button_height);
+
+  const std::vector<HWND> config_controls{
+    bin_label_.hwnd(), bin_text_.hwnd(), browse_button_.hwnd(), open_bin_button_.hwnd(),
+    path_checkbox_.hwnd(), context_menu_checkbox_.hwnd(), language_label_.hwnd(),
+    language_combo_.hwnd(), help_label_.hwnd(), save_button_.hwnd(), cancel_button_.hwnd(),
+  };
+  const std::vector<HWND> entry_controls{
+    entries_list_, refresh_entries_button_.hwnd(), add_entry_button_.hwnd(),
+    rename_entry_button_.hwnd(), delete_entry_button_.hwnd(), open_bin_entries_button_.hwnd(),
+    rename_label_.hwnd(), rename_text_.hwnd(),
+  };
+  for (const auto control : active_tab_ == 0 ? config_controls : entry_controls) {
+    SetWindowPos(control, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+  }
 }
 
 void SettingsWindow::draw(HDC dc) const {
@@ -317,10 +411,10 @@ void SettingsWindow::create_tab_control() {
     WC_TABCONTROLW,
     nullptr,
     WS_CHILD | WS_VISIBLE | WS_TABSTOP,
-    s(24),
-    s(76),
-    s(812),
-    s(500),
+    s(0),
+    s(0),
+    s(860),
+    s(620),
     hwnd(),
     reinterpret_cast<HMENU>(static_cast<UINT_PTR>(kIdTab)),
     reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(hwnd(), GWLP_HINSTANCE)),
@@ -429,6 +523,9 @@ void SettingsWindow::show_tab(int tab_index) {
   if (entries_visible) {
     refresh_entries();
   }
+  RECT client{};
+  GetClientRect(hwnd(), &client);
+  layout_controls(client.right - client.left, client.bottom - client.top);
   InvalidateRect(hwnd(), nullptr, TRUE);
 }
 
