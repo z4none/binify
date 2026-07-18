@@ -24,7 +24,6 @@ private:
   void create_controls();
   void draw(HDC dc) const;
   void load_config();
-  void update_entry_preview();
   void create_command();
   [[nodiscard]] core::LinkMode selected_link_mode() const;
 
@@ -41,7 +40,6 @@ private:
   wl::label mode_label_;
   wl::combobox mode_combo_;
   wl::label mode_help_;
-  wl::label entry_preview_;
   wl::button create_button_;
   wl::button cancel_button_;
 };

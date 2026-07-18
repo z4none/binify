@@ -41,7 +41,6 @@ AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::pat
     theme_.initialize(hwnd());
     create_controls();
     load_config();
-    update_entry_preview();
     return 0;
   });
 
@@ -55,11 +54,6 @@ AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::pat
 
   on_message(WM_CTLCOLORSTATIC, [](wl::params params) -> LRESULT {
     return reinterpret_cast<LRESULT>(transparent_control_background(reinterpret_cast<HDC>(params.wParam)));
-  });
-
-  on_command({kIdName, kIdMode}, [this](wl::params) -> LRESULT {
-    update_entry_preview();
-    return 0;
   });
 
   on_command(kIdCreate, [this](wl::params) -> LRESULT {
@@ -109,9 +103,6 @@ void AddCommandWindow::create_controls() {
   mode_help_.create(this, -1, text::kLinkModeHelp, {s(190), s(286)}, {s(500), s(46)});
   apply_font(mode_help_.hwnd(), theme_.small_font());
   make_transparent_control(mode_help_.hwnd());
-  entry_preview_.create(this, -1, L"", {s(44), s(382)}, {s(680), s(44)});
-  apply_font(entry_preview_.hwnd(), theme_.body_font());
-  make_transparent_control(entry_preview_.hwnd());
 
   create_button_.create(this, kIdCreate, L"✓  Create", {s(560), s(482)}, {s(100), s(36)});
   apply_font(create_button_.hwnd(), theme_.body_font());
@@ -126,7 +117,6 @@ void AddCommandWindow::draw(HDC dc) const {
   draw_window_background(hwnd(), dc, RGB(0xF6, 0xF8, 0xFB));
   draw_panel(dc, {s(24), s(72), s(744), s(172)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
   draw_panel(dc, {s(24), s(192), s(744), s(342)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
-  draw_panel(dc, {s(24), s(366), s(744), s(440)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
 
   RECT action_bar{s(0), s(464), s(780), s(560)};
   HBRUSH brush = CreateSolidBrush(RGB(0xF0, 0xF3, 0xF8));
@@ -151,24 +141,6 @@ void AddCommandWindow::load_config() {
   }
 
   config_ = *loaded.value();
-}
-
-void AddCommandWindow::update_entry_preview() {
-  if (config_.bin_directory.empty()) {
-    entry_preview_.set_text(L"Final entry: configure Bin directory first.");
-    return;
-  }
-
-  const auto command_name = core::normalize_command_name(name_text_.get_text());
-  if (!command_name) {
-    entry_preview_.set_text(L"Final entry: invalid command name.");
-    return;
-  }
-
-  const auto entry = config_.bin_directory / core::final_entry_name(command_name.value(), selected_link_mode());
-  std::wstring preview = L"Final entry: ";
-  preview += entry.wstring();
-  entry_preview_.set_text(preview);
 }
 
 void AddCommandWindow::create_command() {
