@@ -11,6 +11,7 @@ namespace binify::app {
 struct SettingsSaveRequest {
   core::Config config;
   std::filesystem::path executable_path;
+  std::wstring context_menu_text = L"Add to Binify...";
 };
 
 struct SettingsSaveResult {
@@ -35,4 +36,3 @@ private:
 };
 
 } // namespace binify::app
-

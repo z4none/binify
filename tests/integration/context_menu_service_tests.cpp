@@ -54,10 +54,10 @@ TEST(ContextMenuServiceTests, InstallsAndUninstallsContextMenuUnderCustomKey) {
   const auto command_key_path = key_path + L"\\command";
   const RegistryContextMenuService service{key_path};
 
-  const auto installed = service.install(L"C:\\Program Files\\binify\\binify.exe");
+  const auto installed = service.install(L"C:\\Program Files\\binify\\binify.exe", L"Add to Binify...");
 
   ASSERT_TRUE(installed);
-  EXPECT_EQ(read_default_value(key_path), L"加入 Binify...");
+  EXPECT_EQ(read_default_value(key_path), L"Add to Binify...");
   EXPECT_EQ(read_string_value(key_path, L"Icon"), L"C:\\Program Files\\binify\\binify.exe");
   EXPECT_EQ(read_default_value(command_key_path), L"\"C:\\Program Files\\binify\\binify.exe\" --add \"%1\"");
 

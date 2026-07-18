@@ -9,6 +9,7 @@
 #include "app/add_command_workflow.h"
 #include "app/settings_workflow.h"
 #include "app/uninstall_workflow.h"
+#include "core/language_pack.h"
 #include "platform/windows/config_store.h"
 #include "platform/windows/context_menu_service.h"
 #include "platform/windows/file_logger.h"
@@ -29,13 +30,19 @@ public:
   RuntimeContext(
     std::filesystem::path config_path,
     std::filesystem::path log_directory,
+    std::filesystem::path language_directory,
     std::filesystem::path executable_path);
   RuntimeContext(const RuntimeContext&) = delete;
   RuntimeContext& operator=(const RuntimeContext&) = delete;
 
   [[nodiscard]] const std::filesystem::path& executable_path() const noexcept;
+  [[nodiscard]] std::wstring text(std::string_view key) const;
+  [[nodiscard]] std::wstring text_for_language(std::wstring_view language, std::string_view key) const;
 
   platform::windows::FileConfigStore config_store;
+  std::vector<core::LanguagePack> language_packs;
+  std::wstring system_language;
+  core::Translator translator;
   platform::windows::RegistryPathService path_service;
   platform::windows::RegistryContextMenuService context_menu_service;
   platform::windows::WindowsLinkService link_service;
@@ -54,6 +61,7 @@ private:
 [[nodiscard]] std::filesystem::path current_executable_path();
 [[nodiscard]] core::Result<std::filesystem::path> default_config_path();
 [[nodiscard]] core::Result<std::filesystem::path> default_log_directory();
+[[nodiscard]] std::filesystem::path default_language_directory(const std::filesystem::path& executable_path);
 void show_error(HWND owner, const core::Error& error);
 void show_info(HWND owner, const std::wstring& message);
 

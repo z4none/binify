@@ -7,7 +7,6 @@
 #include "ui/add_command_dialog.h"
 #include "ui/settings_dialog.h"
 #include "ui/ui_runtime.h"
-#include "ui/ui_text.h"
 #include "ui/uninstall_dialog.h"
 
 namespace binify::ui {
@@ -18,7 +17,7 @@ namespace {
 }
 
 [[nodiscard]] int show_exception(const wchar_t* message) noexcept {
-  MessageBoxW(nullptr, message, text::kAppTitle, MB_ICONERROR | MB_OK);
+  MessageBoxW(nullptr, message, L"binify", MB_ICONERROR | MB_OK);
   return 1;
 }
 
@@ -39,8 +38,8 @@ namespace {
   if (!has_configured_bin(runtime)) {
     MessageBoxW(
       nullptr,
-      L"Bin directory is not configured. Configure settings first; after saving, binify will continue adding the selected executable.",
-      text::kAppTitle,
+      runtime.text("add.configure_first_continue").c_str(),
+      runtime.text("app.title").c_str(),
       MB_ICONINFORMATION | MB_OK);
 
     SettingsWindow settings{runtime, true};
@@ -69,7 +68,12 @@ int run_ui(HINSTANCE instance, int command_show, const std::vector<std::wstring>
       return 1;
     }
 
-    RuntimeContext runtime{config_path.value(), log_directory.value(), current_executable_path()};
+    const auto executable_path = current_executable_path();
+    RuntimeContext runtime{
+      config_path.value(),
+      log_directory.value(),
+      default_language_directory(executable_path),
+      executable_path};
     static_cast<void>(runtime.logger.write(app::LogLevel::info, L"binify UI started."));
 
     if (arguments.size() >= 3 && is_option(arguments[1], L"--add")) {

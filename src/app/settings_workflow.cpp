@@ -43,7 +43,7 @@ core::Result<SettingsSaveResult> SettingsWorkflow::save(const SettingsSaveReques
   }
 
   if (request.config.context_menu_enabled) {
-    auto installed = context_menu_service_.install(request.executable_path);
+    auto installed = context_menu_service_.install(request.executable_path, request.context_menu_text);
     if (!installed) {
       return installed.error();
     }
@@ -65,4 +65,3 @@ core::Result<SettingsSaveResult> SettingsWorkflow::save(const SettingsSaveReques
 }
 
 } // namespace binify::app
-

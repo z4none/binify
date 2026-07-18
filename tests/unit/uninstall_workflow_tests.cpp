@@ -32,7 +32,7 @@ public:
 
 class FakeContextMenuService final : public ContextMenuService {
 public:
-  Result<void> install(const std::filesystem::path&) const override {
+  Result<void> install(const std::filesystem::path&, const std::wstring&) const override {
     return {};
   }
 

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <filesystem>
+#include <string>
 
+#include "core/language_pack.h"
 #include "core/result.h"
 
 namespace binify::core {
@@ -11,6 +13,7 @@ inline constexpr int kCurrentConfigVersion = 1;
 struct Config {
   int config_version = kCurrentConfigVersion;
   std::filesystem::path bin_directory;
+  std::wstring language = std::wstring{kSystemLanguageCode};
   bool context_menu_enabled = false;
   bool path_enabled = false;
 };

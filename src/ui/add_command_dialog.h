@@ -42,6 +42,7 @@ private:
   wl::label mode_help_;
   wl::button create_button_;
   wl::button cancel_button_;
+  std::wstring window_title_;
 };
 
 } // namespace binify::ui

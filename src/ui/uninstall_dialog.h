@@ -32,6 +32,7 @@ private:
   wl::checkbox context_menu_checkbox_;
   wl::button cleanup_button_;
   wl::button cancel_button_;
+  std::wstring window_title_;
 };
 
 } // namespace binify::ui

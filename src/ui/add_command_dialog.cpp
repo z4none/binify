@@ -4,7 +4,6 @@
 
 #include "ui/conflict_dialog.h"
 #include "ui/result_dialog.h"
-#include "ui/ui_text.h"
 
 namespace binify::ui {
 namespace {
@@ -30,10 +29,11 @@ std::wstring default_command_name(const std::filesystem::path& source_path) {
 
 AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::path source_path)
   : runtime_(runtime), source_path_(std::move(source_path)) {
+  window_title_ = runtime_.text("add.title");
   setup.wndClassEx.lpszClassName = L"BINIFY_ADD_COMMAND_WINDOW";
   setup.wndClassEx.hIcon = app_icon(32);
   setup.wndClassEx.hIconSm = app_icon(16);
-  setup.title = text::kAddCommandTitle;
+  setup.title = window_title_.c_str();
   setup.size = scale_size_for_system_dpi(780, 560);
   setup.style |= WS_MINIMIZEBOX;
 
@@ -72,25 +72,25 @@ AddCommandWindow::AddCommandWindow(RuntimeContext& runtime, std::filesystem::pat
 void AddCommandWindow::create_controls() {
   const auto s = [this](int value) { return theme_.scale(value); };
 
-  title_label_.create(this, -1, L"➕  Add command", {s(24), s(18)}, {s(420), s(34)});
+  title_label_.create(this, -1, runtime_.text("add.heading").c_str(), {s(24), s(18)}, {s(420), s(34)});
   apply_font(title_label_.hwnd(), theme_.title_font());
   make_transparent_control(title_label_.hwnd());
 
-  source_label_.create(this, -1, L"Source executable", {s(44), s(88)}, {s(160), s(22)});
+  source_label_.create(this, -1, runtime_.text("add.source_executable").c_str(), {s(44), s(88)}, {s(160), s(22)});
   apply_font(source_label_.hwnd(), theme_.body_font());
   make_transparent_control(source_label_.hwnd());
   source_value_.create(this, -1, source_path_.wstring().c_str(), {s(44), s(118)}, {s(660), s(42)});
   apply_font(source_value_.hwnd(), theme_.small_font());
   make_transparent_control(source_value_.hwnd());
 
-  name_label_.create(this, -1, L"Command name", {s(44), s(208)}, {s(140), s(22)});
+  name_label_.create(this, -1, runtime_.text("add.command_name").c_str(), {s(44), s(208)}, {s(140), s(22)});
   apply_font(name_label_.hwnd(), theme_.body_font());
   make_transparent_control(name_label_.hwnd());
   name_text_.create(this, kIdName, wl::textbox::type::NORMAL, {s(190), s(204)}, s(260), s(25));
   apply_font(name_text_.hwnd(), theme_.body_font());
   name_text_.set_text(default_command_name(source_path_));
 
-  mode_label_.create(this, -1, L"Link mode", {s(44), s(252)}, {s(140), s(22)});
+  mode_label_.create(this, -1, runtime_.text("add.link_mode").c_str(), {s(44), s(252)}, {s(140), s(22)});
   apply_font(mode_label_.hwnd(), theme_.body_font());
   make_transparent_control(mode_label_.hwnd());
   mode_combo_.create(this, kIdMode, {s(190), s(248)}, s(260), wl::combobox::sort::UNSORTED);
@@ -100,14 +100,15 @@ void AddCommandWindow::create_controls() {
   mode_combo_.add({L"Auto", L"Symbolic Link", L"Hard Link", L"CMD Wrapper"});
   mode_combo_.select(0);
 
-  mode_help_.create(this, -1, text::kLinkModeHelp, {s(190), s(286)}, {s(500), s(46)});
+  mode_help_.create(this, -1, runtime_.text("add.link_mode_help").c_str(), {s(190), s(286)}, {s(500), s(46)});
   apply_font(mode_help_.hwnd(), theme_.small_font());
   make_transparent_control(mode_help_.hwnd());
 
-  create_button_.create(this, kIdCreate, L"✓  Create", {s(560), s(482)}, {s(100), s(36)});
+  const auto create_text = L"✓  " + runtime_.text("common.create");
+  create_button_.create(this, kIdCreate, create_text.c_str(), {s(560), s(482)}, {s(100), s(36)});
   apply_font(create_button_.hwnd(), theme_.body_font());
   make_modern_button(create_button_.hwnd(), ButtonRole::primary);
-  cancel_button_.create(this, kIdCancel, text::kCancel, {s(674), s(482)}, {s(82), s(36)});
+  cancel_button_.create(this, kIdCancel, runtime_.text("common.cancel").c_str(), {s(674), s(482)}, {s(82), s(36)});
   apply_font(cancel_button_.hwnd(), theme_.body_font());
   make_modern_button(cancel_button_.hwnd(), ButtonRole::secondary);
 }
@@ -134,8 +135,8 @@ void AddCommandWindow::load_config() {
   if (!loaded.value() || !core::is_configured(*loaded.value())) {
     MessageBoxW(
       hwnd(),
-      L"Bin directory is not configured. Open binify normally to configure settings first.",
-      text::kAppTitle,
+      runtime_.text("add.bin_not_configured").c_str(),
+      runtime_.text("app.title").c_str(),
       MB_ICONWARNING | MB_OK);
     return;
   }
@@ -145,12 +146,12 @@ void AddCommandWindow::load_config() {
 
 void AddCommandWindow::create_command() {
   if (config_.bin_directory.empty()) {
-    MessageBoxW(hwnd(), L"Configure Bin directory before creating commands.", text::kAppTitle, MB_ICONWARNING | MB_OK);
+    MessageBoxW(hwnd(), runtime_.text("add.configure_bin_before_create").c_str(), runtime_.text("app.title").c_str(), MB_ICONWARNING | MB_OK);
     return;
   }
 
   if (!std::filesystem::exists(source_path_)) {
-    MessageBoxW(hwnd(), L"Source executable does not exist.", text::kAppTitle, MB_ICONERROR | MB_OK);
+    MessageBoxW(hwnd(), runtime_.text("add.source_missing").c_str(), runtime_.text("app.title").c_str(), MB_ICONERROR | MB_OK);
     return;
   }
 
@@ -169,7 +170,7 @@ void AddCommandWindow::create_command() {
   auto conflicts = core::find_command_conflicts(command_name.value().normalized, entries.value());
   app::ConflictDecision decision = app::ConflictDecision::cancel;
   if (!conflicts.empty()) {
-    if (!confirm_overwrite(hwnd(), conflicts)) {
+    if (!confirm_overwrite(hwnd(), conflicts, runtime_.translator)) {
       return;
     }
     decision = app::ConflictDecision::overwrite;
@@ -188,7 +189,7 @@ void AddCommandWindow::create_command() {
   }
 
   static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Command entry created."));
-  show_add_success(hwnd(), result.value());
+  show_add_success(hwnd(), result.value(), runtime_.translator);
 }
 
 core::LinkMode AddCommandWindow::selected_link_mode() const {

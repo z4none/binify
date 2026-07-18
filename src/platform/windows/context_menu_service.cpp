@@ -12,7 +12,6 @@ namespace binify::platform::windows {
 namespace {
 
 constexpr const wchar_t* kDefaultShellKeyPath = L"Software\\Classes\\SystemFileAssociations\\.exe\\shell\\binify";
-constexpr const wchar_t* kMenuText = L"加入 Binify...";
 
 core::Error registry_error(std::wstring message, LSTATUS status, const std::wstring& path) {
   return core::make_error(
@@ -45,7 +44,9 @@ RegistryContextMenuService::RegistryContextMenuService()
 RegistryContextMenuService::RegistryContextMenuService(std::wstring shell_key_path)
   : shell_key_path_(std::move(shell_key_path)) {}
 
-core::Result<void> RegistryContextMenuService::install(const std::filesystem::path& executable_path) const {
+core::Result<void> RegistryContextMenuService::install(
+  const std::filesystem::path& executable_path,
+  const std::wstring& menu_text) const {
   auto command = core::format_context_menu_command(executable_path);
   if (!command) {
     return command.error();
@@ -66,7 +67,7 @@ core::Result<void> RegistryContextMenuService::install(const std::filesystem::pa
     return registry_error(L"Failed to create context menu shell key.", status, shell_key_path_);
   }
 
-  auto written_menu = set_string_value(shell_key, nullptr, kMenuText);
+  auto written_menu = set_string_value(shell_key, nullptr, menu_text);
   auto written_icon = written_menu ? set_string_value(shell_key, L"Icon", executable_path.wstring()) : written_menu;
   RegCloseKey(shell_key);
   if (!written_menu) {

@@ -18,6 +18,7 @@ add_library(binify_core STATIC
   src/core/context_menu_command.cpp
   src/core/creation_policy.cpp
   src/core/error.cpp
+  src/core/language_pack.cpp
   src/core/path_utils.cpp
   src/core/path_value.cpp
   src/core/text_encoding.cpp)
@@ -74,6 +75,10 @@ add_executable(binify WIN32
   resources/binify.rc)
 target_link_libraries(binify PRIVATE binify::ui shell32)
 binify_apply_project_options(binify)
+add_custom_command(TARGET binify POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/lang"
+    "$<TARGET_FILE_DIR:binify>/lang")
 
 enable_testing()
 
@@ -89,6 +94,7 @@ add_executable(binify_unit_tests
   tests/unit/creation_policy_tests.cpp
   tests/unit/entry_transaction_tests.cpp
   tests/unit/error_tests.cpp
+  tests/unit/language_pack_tests.cpp
   tests/unit/path_utils_tests.cpp
   tests/unit/path_value_tests.cpp
   tests/unit/result_tests.cpp

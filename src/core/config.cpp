@@ -28,6 +28,10 @@ Result<void> validate_config_model(const Config& config) {
       config.bin_directory.wstring());
   }
 
+  if (!is_language_code_valid(config.language)) {
+    return make_error(ErrorCode::config_invalid, L"Configured language code is invalid.");
+  }
+
   return {};
 }
 
@@ -41,10 +45,15 @@ Result<std::string> serialize_config_to_json(const Config& config) {
   if (!bin_directory) {
     return bin_directory.error();
   }
+  auto language = wide_to_utf8(config.language);
+  if (!language) {
+    return language.error();
+  }
 
   const nlohmann::json json{
     {"configVersion", config.config_version},
     {"binDirectory", bin_directory.value()},
+    {"language", language.value()},
     {"contextMenuEnabled", config.context_menu_enabled},
     {"pathEnabled", config.path_enabled},
   };
@@ -60,6 +69,7 @@ Result<Config> deserialize_config_from_json(const std::string& json_text) {
 
     const auto version = json.at("configVersion").get<int>();
     const auto bin_directory_utf8 = json.at("binDirectory").get<std::string>();
+    const auto language_utf8 = json.value("language", "system");
     const auto context_menu_enabled = json.at("contextMenuEnabled").get<bool>();
     const auto path_enabled = json.at("pathEnabled").get<bool>();
 
@@ -67,10 +77,15 @@ Result<Config> deserialize_config_from_json(const std::string& json_text) {
     if (!bin_directory) {
       return bin_directory.error();
     }
+    auto language = utf8_to_wide(language_utf8);
+    if (!language) {
+      return language.error();
+    }
 
     Config config{
       .config_version = version,
       .bin_directory = std::filesystem::path{bin_directory.value()},
+      .language = language.value(),
       .context_menu_enabled = context_menu_enabled,
       .path_enabled = path_enabled,
     };

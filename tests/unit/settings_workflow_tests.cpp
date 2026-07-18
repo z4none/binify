@@ -50,8 +50,9 @@ public:
 
 class FakeContextMenuService final : public ContextMenuService {
 public:
-  Result<void> install(const std::filesystem::path& executable_path) const override {
+  Result<void> install(const std::filesystem::path& executable_path, const std::wstring& menu_text) const override {
     installed_executable = executable_path;
+    installed_menu_text = menu_text;
     return {};
   }
 
@@ -61,6 +62,7 @@ public:
   }
 
   mutable std::filesystem::path installed_executable;
+  mutable std::wstring installed_menu_text;
   mutable bool uninstall_called = false;
 };
 
@@ -81,12 +83,14 @@ TEST(SettingsWorkflowTests, SavesNewConfigAndAppliesEnabledIntegrations) {
   const auto result = workflow.save(SettingsSaveRequest{
     .config = config(L"C:\\Users\\zi\\bin", true, true),
     .executable_path = L"C:\\Program Files\\binify\\binify.exe",
+    .context_menu_text = L"加入 Binify...",
   });
 
   ASSERT_TRUE(result);
   EXPECT_TRUE(store.save_called);
   EXPECT_EQ(path.added_path, L"C:\\Users\\zi\\bin");
   EXPECT_EQ(context_menu.installed_executable, L"C:\\Program Files\\binify\\binify.exe");
+  EXPECT_EQ(context_menu.installed_menu_text, L"加入 Binify...");
   EXPECT_TRUE(result.value().config_saved);
   EXPECT_TRUE(result.value().path_changed);
   EXPECT_TRUE(result.value().context_menu_changed);
@@ -127,4 +131,3 @@ TEST(SettingsWorkflowTests, RemovesDisabledIntegrationsFromPreviousConfig) {
 }
 
 } // namespace
-

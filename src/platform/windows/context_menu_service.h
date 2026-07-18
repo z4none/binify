@@ -11,7 +11,9 @@ public:
   RegistryContextMenuService();
   explicit RegistryContextMenuService(std::wstring shell_key_path);
 
-  [[nodiscard]] core::Result<void> install(const std::filesystem::path& executable_path) const override;
+  [[nodiscard]] core::Result<void> install(
+    const std::filesystem::path& executable_path,
+    const std::wstring& menu_text) const override;
   [[nodiscard]] core::Result<void> uninstall() const override;
 
 private:
@@ -19,4 +21,3 @@ private:
 };
 
 } // namespace binify::platform::windows
-

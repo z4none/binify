@@ -3,11 +3,14 @@
 #include <windows.h>
 #include <shellapi.h>
 
+#include <vector>
+
 #include "ui/ui_runtime.h"
 #include "ui/ui_theme.h"
 
 #include "button.h"
 #include "checkbox.h"
+#include "combobox.h"
 #include "label.h"
 #include "textbox.h"
 #include "window_main.h"
@@ -26,6 +29,8 @@ private:
   void save_config();
   void browse_bin_directory();
   void open_bin_directory() const;
+  void populate_languages();
+  [[nodiscard]] std::wstring selected_language() const;
 
   RuntimeContext& runtime_;
   bool close_after_success_ = false;
@@ -36,10 +41,14 @@ private:
   wl::button browse_button_;
   wl::checkbox path_checkbox_;
   wl::checkbox context_menu_checkbox_;
+  wl::label language_label_;
+  wl::combobox language_combo_;
   wl::label help_label_;
   wl::button open_bin_button_;
   wl::button save_button_;
   wl::button cancel_button_;
+  std::vector<core::AvailableLanguage> languages_;
+  std::wstring window_title_;
 };
 
 } // namespace binify::ui
