@@ -100,6 +100,8 @@ void AddCommandWindow::create_controls() {
   apply_font(mode_label_.hwnd(), theme_.body_font());
   make_transparent_control(mode_label_.hwnd());
   mode_combo_.create(this, kIdMode, {s(190), s(248)}, s(260), wl::combobox::sort::UNSORTED);
+  SetWindowPos(mode_combo_.hwnd(), nullptr, 0, 0, s(260), s(150), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+  SendMessageW(mode_combo_.hwnd(), CB_SETMINVISIBLE, kModes.size(), 0);
   apply_font(mode_combo_.hwnd(), theme_.body_font());
   mode_combo_.add({L"Auto", L"Symbolic Link", L"Hard Link", L"CMD Wrapper"});
   mode_combo_.select(0);
