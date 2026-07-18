@@ -108,35 +108,35 @@ void SettingsWindow::create_controls() {
   bin_label_.create(this, -1, runtime_.text("settings.bin_directory").c_str(), {s(44), s(88)}, {s(150), s(22)});
   apply_font(bin_label_.hwnd(), theme_.body_font());
   make_transparent_control(bin_label_.hwnd());
-  bin_text_.create(this, kIdBinText, wl::textbox::type::NORMAL, {s(44), s(116)}, s(500), s(25));
+  bin_text_.create(this, kIdBinText, wl::textbox::type::NORMAL, {s(44), s(116)}, s(280), s(25));
   apply_font(bin_text_.hwnd(), theme_.body_font());
   const auto browse_text = L"📁  " + runtime_.text("common.browse");
-  browse_button_.create(this, kIdBrowse, browse_text.c_str(), {s(565), s(114)}, {s(130), s(32)});
+  browse_button_.create(this, kIdBrowse, browse_text.c_str(), {s(350), s(114)}, {s(104), s(32)});
   apply_font(browse_button_.hwnd(), theme_.body_font());
   make_modern_button(browse_button_.hwnd(), ButtonRole::secondary);
+  const auto open_bin_text = L"📂  " + runtime_.text("common.open_bin");
+  open_bin_button_.create(this, kIdOpenBin, open_bin_text.c_str(), {s(470), s(114)}, {s(104), s(32)});
+  apply_font(open_bin_button_.hwnd(), theme_.body_font());
+  make_modern_button(open_bin_button_.hwnd(), ButtonRole::secondary);
 
-  path_checkbox_.create(this, kIdPath, runtime_.text("settings.path_toggle").c_str(), {s(44), s(194)}, {s(520), s(26)});
+  path_checkbox_.create(this, kIdPath, runtime_.text("settings.path_toggle").c_str(), {s(44), s(198)}, {s(640), s(26)});
   apply_font(path_checkbox_.hwnd(), theme_.body_font());
   make_transparent_control(path_checkbox_.hwnd());
-  context_menu_checkbox_.create(this, kIdContextMenu, runtime_.text("settings.context_menu_toggle").c_str(), {s(44), s(230)}, {s(560), s(26)});
+  context_menu_checkbox_.create(this, kIdContextMenu, runtime_.text("settings.context_menu_toggle").c_str(), {s(44), s(238)}, {s(640), s(26)});
   apply_font(context_menu_checkbox_.hwnd(), theme_.body_font());
   make_transparent_control(context_menu_checkbox_.hwnd());
 
-  language_label_.create(this, -1, runtime_.text("settings.language").c_str(), {s(44), s(268)}, {s(140), s(22)});
+  language_label_.create(this, -1, runtime_.text("settings.language").c_str(), {s(44), s(282)}, {s(140), s(22)});
   apply_font(language_label_.hwnd(), theme_.body_font());
   make_transparent_control(language_label_.hwnd());
-  language_combo_.create(this, kIdLanguage, {s(190), s(264)}, s(260), wl::combobox::sort::UNSORTED);
+  language_combo_.create(this, kIdLanguage, {s(190), s(278)}, s(260), wl::combobox::sort::UNSORTED);
   SetWindowPos(language_combo_.hwnd(), nullptr, 0, 0, s(260), s(140), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
   apply_font(language_combo_.hwnd(), theme_.body_font());
   populate_languages();
 
-  help_label_.create(this, -1, runtime_.text("settings.help").c_str(), {s(44), s(326)}, {s(620), s(38)});
+  help_label_.create(this, -1, runtime_.text("settings.help").c_str(), {s(44), s(368)}, {s(680), s(28)});
   apply_font(help_label_.hwnd(), theme_.small_font());
   make_transparent_control(help_label_.hwnd());
-  const auto open_bin_text = L"📂  " + runtime_.text("common.open_bin");
-  open_bin_button_.create(this, kIdOpenBin, open_bin_text.c_str(), {s(44), s(380)}, {s(150), s(34)});
-  apply_font(open_bin_button_.hwnd(), theme_.body_font());
-  make_modern_button(open_bin_button_.hwnd(), ButtonRole::secondary);
 
   const auto save_text = L"✓  " + runtime_.text("common.save");
   save_button_.create(this, kIdSave, save_text.c_str(), {s(550), s(462)}, {s(90), s(36)});
@@ -151,8 +151,7 @@ void SettingsWindow::draw(HDC dc) const {
   const auto s = [this](int value) { return theme_.scale(value); };
   draw_window_background(hwnd(), dc, RGB(0xF6, 0xF8, 0xFB));
   draw_panel(dc, {s(24), s(72), s(720), s(160)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
-  draw_panel(dc, {s(24), s(178), s(720), s(278)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
-  draw_panel(dc, {s(24), s(302), s(720), s(426)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
+  draw_panel(dc, {s(24), s(178), s(720), s(342)}, RGB(0xFF, 0xFF, 0xFF), RGB(0xE3, 0xE8, 0xF0), s(18));
 
   RECT action_bar{s(0), s(444), s(760), s(540)};
   HBRUSH brush = CreateSolidBrush(RGB(0xF0, 0xF3, 0xF8));
