@@ -278,12 +278,8 @@ void SettingsWindow::create_controls() {
 void SettingsWindow::layout_controls() {
   RECT client{};
   GetClientRect(hwnd(), &client);
-  // WinLamb/control coordinates are authored in 96-DPI logical units. GetClientRect
-  // returns the current DPI-scaled client size, so convert it back before deriving
-  // responsive positions. Without this, controls and the tab page drift off-screen
-  // on high-DPI displays.
-  int width = MulDiv(client.right - client.left, 96, static_cast<int>(theme_.dpi()));
-  int height = MulDiv(client.bottom - client.top, 96, static_cast<int>(theme_.dpi()));
+  int width = client.right - client.left;
+  int height = client.bottom - client.top;
   width = std::max(width, kMinWindowWidth);
   height = std::max(height, kMinWindowHeight);
 
