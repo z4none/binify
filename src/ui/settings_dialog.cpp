@@ -15,7 +15,6 @@ constexpr int kIdContextMenu = 1004;
 constexpr int kIdOpenBin = 1005;
 constexpr int kIdSave = 1006;
 constexpr int kIdCancel = 1007;
-constexpr int kIdHello = 1008;
 
 std::filesystem::path choose_folder(HWND owner) {
   const HRESULT initialized = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -92,11 +91,6 @@ SettingsWindow::SettingsWindow(RuntimeContext& runtime) : runtime_(runtime) {
     return 0;
   });
 
-  on_command(kIdHello, [this](wl::params) -> LRESULT {
-    static_cast<void>(runtime_.logger.write(app::LogLevel::info, L"Settings Hello clicked."));
-    MessageBoxW(hwnd(), L"hello", text::kAppTitle, MB_OK | MB_ICONINFORMATION);
-    return 0;
-  });
 }
 
 void SettingsWindow::create_controls() {
@@ -105,20 +99,6 @@ void SettingsWindow::create_controls() {
   title_label_.create(this, -1, L"⚙  binify settings", {s(24), s(18)}, {s(420), s(34)});
   apply_font(title_label_.hwnd(), theme_.title_font());
   make_transparent_control(title_label_.hwnd());
-  hello_button_ = CreateWindowExW(
-    0,
-    L"BUTTON",
-    L"Hello",
-    WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
-    s(620),
-    s(20),
-    s(90),
-    s(30),
-    hwnd(),
-    reinterpret_cast<HMENU>(static_cast<INT_PTR>(kIdHello)),
-    GetModuleHandleW(nullptr),
-    nullptr);
-  apply_font(hello_button_, theme_.body_font());
 
   bin_label_.create(this, -1, L"Bin directory", {s(44), s(88)}, {s(150), s(22)});
   apply_font(bin_label_.hwnd(), theme_.body_font());
