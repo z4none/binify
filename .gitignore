@@ -16,3 +16,8 @@ out/
 *.exp
 Testing/
 third_party/innosetup/
+
+docs/
+findings.md
+progress.md
+task_plan.md
