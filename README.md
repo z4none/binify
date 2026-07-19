@@ -12,10 +12,13 @@ Configure your Bin directory, current-user PATH integration, Explorer context me
 
 ![binify settings](screenshot/main.png)
 
-| Add command | Manage entries |
-| --- | --- |
-| ![Add command dialog](screenshot/add-command.png) | ![Entries tab](screenshot/entries.png) |
-| Confirm the command name and creation mode before adding an executable. | Review, rename, delete, or open entries already in the Bin directory. |
+Confirm the command name and creation mode before adding an executable.
+
+![Add command dialog](screenshot/add-command.png)
+
+Review, rename, delete, or open entries already in the Bin directory.
+
+![Entries tab](screenshot/entries.png)
 
 Add executables from File Explorer with the right-click menu.
 
