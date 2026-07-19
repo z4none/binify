@@ -8,11 +8,19 @@
 
 ## 截图
 
+配置 Bin 目录、当前用户 PATH 集成、资源管理器右键菜单和界面语言。
+
 ![binify 设置](screenshot/main.png)
 
-| 添加命令 | 管理条目 |
-| --- | --- |
-| ![添加命令对话框](screenshot/add-command.png) | ![Entries 页面](screenshot/entries.png) |
+添加可执行文件前，确认命令名和创建方式。
+
+![添加命令对话框](screenshot/add-command.png)
+
+查看、重命名、删除或打开 Bin 目录中已有的条目。
+
+![Entries 页面](screenshot/entries.png)
+
+通过资源管理器右键菜单快速添加可执行文件。
 
 ![资源管理器右键菜单](screenshot/context.png)
 

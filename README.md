@@ -8,11 +8,16 @@ Pick a Bin directory, add it to your current-user `PATH`, then right-click an `.
 
 ## Screenshots
 
+Configure your Bin directory, current-user PATH integration, Explorer context menu, and UI language.
+
 ![binify settings](screenshot/main.png)
 
 | Add command | Manage entries |
 | --- | --- |
 | ![Add command dialog](screenshot/add-command.png) | ![Entries tab](screenshot/entries.png) |
+| Confirm the command name and creation mode before adding an executable. | Review, rename, delete, or open entries already in the Bin directory. |
+
+Add executables from File Explorer with the right-click menu.
 
 ![Explorer context menu](screenshot/context.png)
 
