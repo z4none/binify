@@ -4,3 +4,7 @@
 *.rc text eol=crlf
 *.manifest text eol=crlf
 
+/docs/ export-ignore
+/findings.md export-ignore
+/progress.md export-ignore
+/task_plan.md export-ignore
