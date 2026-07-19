@@ -2,7 +2,9 @@
 
 `binify` is a small Windows utility for turning desktop executables into command-line entries.
 
-Pick a Bin directory, add it to your current-user `PATH`, then right-click an `.exe` file and add it as a command. `binify` creates the entry with a symbolic link, hard link, or a simple CMD wrapper.
+The usual way to run GUI tools from the command line is to add each tool directory to `PATH`. That works, but it gets messy: existing terminals often need to be restarted before changes apply, files from different directories can conflict, and a long `PATH` becomes harder to maintain and may slow down process lookup.
+
+`binify` keeps `PATH` small by using one Bin directory as the command entry point. Pick a Bin directory, add it to your current-user `PATH`, then right-click an `.exe` file and add it as a command. `binify` creates the entry with a symbolic link, hard link, or a simple CMD wrapper.
 
 [中文说明](README.zh-CN.md)
 
